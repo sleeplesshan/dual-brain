@@ -1,0 +1,28 @@
+# Security Policy
+
+## About this project
+
+Dual-Brain is a [Claude Code](https://claude.com/claude-code) skill. It consists of Markdown instructions (`SKILL.md`) that guide an AI agent's behavior — it ships **no executable code, no dependencies, and no network services**. The attack surface is therefore minimal.
+
+That said, because the skill instructs an agent that can read files and run tools on your machine, we take prompt-level concerns seriously (for example, wording that could lead an agent to take unintended actions).
+
+## Supported versions
+
+The latest version on the `main` branch is supported. There are no separate release branches.
+
+## Reporting a vulnerability
+
+If you discover a security concern — including prompt-injection risks or instructions that could cause unintended agent behavior — please report it privately:
+
+- **Preferred:** open a [private security advisory](https://github.com/sleeplesshan/dual-brain/security/advisories/new) on GitHub.
+- **Or email:** **qwod123@gmail.com**
+
+Please include:
+
+- A description of the issue and its potential impact.
+- Steps to reproduce (e.g., the task/prompt that triggered the behavior).
+- Any suggested mitigation, if you have one.
+
+Please do **not** open a public issue for security reports. We'll acknowledge your report as soon as we can and keep you updated on the fix.
+
+Thank you for helping keep Dual-Brain and its users safe. 🙏
