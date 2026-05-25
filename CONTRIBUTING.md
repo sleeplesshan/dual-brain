@@ -20,7 +20,7 @@ Thanks for your interest in improving Dual-Brain! 🧠 This is a [Claude Code](h
 
 ## Making changes
 
-- The **heart of the skill is `SKILL.md`** — especially the two persona blocks and the fixed Step 0–4 protocol. Tune these carefully and keep the fixed order (Right Brain → Left Brain → consensus).
+- The **heart of the skill is `SKILL.md`** — especially the two persona blocks and the fixed Step 0–4 protocol. Tune these carefully and keep the fixed order (Right Brain grills → Left Brain verifies → dual synthesis).
 - Keep the `description:` frontmatter in `SKILL.md` accurate — it's how Claude Code decides when to trigger the skill.
 - If you change behavior, update the README so docs stay in sync.
 - Test your change against at least one real task before opening a PR, and describe what you observed.

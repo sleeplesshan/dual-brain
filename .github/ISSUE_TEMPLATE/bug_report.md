@@ -20,7 +20,7 @@ What did you ask Dual-Brain to do? Paste the prompt / trigger you used.
 
 ## Expected behavior
 
-What you expected to happen (e.g. Right Brain proposes first, then Left Brain verifies).
+What you expected to happen (e.g. Right Brain grills first, then Left Brain verifies against real code/docs).
 
 ## Actual behavior
 
