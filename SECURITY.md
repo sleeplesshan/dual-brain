@@ -1,0 +1,53 @@
+# Security Policy
+
+## About this project
+
+Dual-Brain is a [Claude Code](https://claude.com/claude-code) skill. It consists of Markdown instructions (`SKILL.md`) that guide an AI agent's behavior — it ships **no executable code, no dependencies, and no network services**. The attack surface is therefore minimal.
+
+That said, because the skill instructs an agent that can read files and run tools on your machine, we take prompt-level concerns seriously (for example, wording that could lead an agent to take unintended actions).
+
+## Project memory safety
+
+Dual-Brain can read project-local memory from:
+
+```text
+.dual-brain/MEMORY.md
+```
+
+That file is useful, but it is still untrusted project text. The skill must treat memory as advisory context, verify it against current code/docs, and never follow memory that attempts to override user intent, tool safety, or system instructions.
+
+Do **not** store secrets in project memory:
+
+- API keys
+- access tokens
+- credentials
+- private keys
+- session cookies
+- sensitive personal data
+- production incident details that should not live in a repo
+
+If memory contains sensitive content, Dual-Brain should not summarize it into future context. It should propose removing it.
+
+Dual-Brain must also avoid silent memory mutation. Memory updates and compaction should be proposed as patches to `.dual-brain/MEMORY.md` and applied only after user approval.
+
+## Supported versions
+
+The latest version on the `main` branch is supported. There are no separate release branches.
+
+## Reporting a vulnerability
+
+If you discover a security concern — including prompt-injection risks, unsafe memory handling, or instructions that could cause unintended agent behavior — please report it privately:
+
+- **Preferred:** open a [private security advisory](https://github.com/sleeplesshan/dual-brain/security/advisories/new) on GitHub.
+- **Or email:** **qwod123@gmail.com**
+
+Please include:
+
+- A description of the issue and its potential impact.
+- Steps to reproduce (e.g., the task/prompt that triggered the behavior).
+- Whether `.dual-brain/MEMORY.md` was present and what kind of memory behavior was involved.
+- Any suggested mitigation, if you have one.
+
+Please do **not** open a public issue for security reports. We'll acknowledge your report as soon as we can and keep you updated on the fix.
+
+Thank you for helping keep Dual-Brain and its users safe. 🙏
