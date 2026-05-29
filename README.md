@@ -175,7 +175,15 @@ Compaction is part of the same auto-save step. After saving, the agent summarize
 
 ## 📦 Installation
 
-Clone this repo straight into your Codex skills directory:
+For multi-agent or multi-project setups, use [SkillsGate](https://github.com/skillsgate/skillsgate). It supports Codex CLI and Claude Code, installs skills into the right agent locations, and keeps one shared skill source so you do not have to re-clone this repo across every project.
+
+```bash
+npx skillsgate add sleeplesshan/dual-brain -g
+```
+
+Prefer explicit directories? Manual install still works.
+
+Clone this repo into your Codex skills directory:
 
 ```bash
 git clone https://github.com/sleeplesshan/dual-brain.git ~/.codex/skills/dual-brain
@@ -224,6 +232,33 @@ Dual-Brain shines when a task needs **both creative interrogation and rigorous, 
 | Architecture & design decisions | Anything you already know the answer to |
 | Anything where hallucinated APIs would hurt | Pure boilerplate |
 | Projects with recurring decisions and tradeoffs | One-off throwaway snippets |
+
+---
+
+## 📊 Benchmarking
+
+Dual-Brain includes a benchmark harness for comparing Codex `single-agent` vs. Codex `dual-brain` runs on controlled sandbox repos:
+
+```bash
+python3 benchmarks/bench.py list
+python3 benchmarks/bench.py run --suite core5
+python3 benchmarks/bench.py summarize benchmarks/runs/<run-id>
+```
+
+The default suite runs five focused cases and treats time/token usage as cost, not the primary score. The core question is whether Dual-Brain's extra reasoning reduces correction loops, hallucination risk, and architecture/memory regression. See [benchmarks/README.md](benchmarks/README.md) for the full workflow.
+
+### Early Benchmark Snapshot
+
+One 5-case Codex run produced this initial snapshot:
+
+| Metric | Single-agent | Dual-Brain |
+|---|---:|---:|
+| Pass rate | 3/5 | 4/5 |
+| First-pass correctness | 1/5 | 3/5 |
+| Human repair prompts | 2 | 1 |
+| Memory regressions | 2/2 | 1/2 |
+
+Dual-Brain is not faster per attempt; it is designed to reduce the follow-up prompts humans need after sloppy agent work. This is a small initial benchmark snapshot, not a universal claim. Repeat the suite for stronger evidence. See [benchmarks/RESULTS.md](benchmarks/RESULTS.md) for the captured run.
 
 ---
 
