@@ -29,9 +29,9 @@ What actually happened. If memory was skipped, stale memory was trusted, a brain
 ## Project memory
 
 - Was `.dual-brain/MEMORY.md` present? yes / no
-- Did the skill read it, ignore it, misapply it, or propose an incorrect update?
+- Did the skill read it, ignore it, misapply it, or save an incorrect update?
 - Did the memory contain stale, contradictory, overgrown, or sensitive content?
-- Did the skill auto-write memory instead of proposing a patch?
+- Did the skill fail to ask what memory should be removed or adjusted after saving?
 
 ## Environment
 

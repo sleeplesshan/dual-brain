@@ -30,10 +30,10 @@ If memory behavior changed, note which cases you tested:
 
 ## Checklist
 
-- [ ] `SKILL.md` keeps the fixed order (memory intake → Right Brain grills → Left Brain verifies → dual synthesis → memory patch proposal).
+- [ ] `SKILL.md` keeps the fixed order (memory intake → Right Brain grills → Left Brain verifies → dual synthesis → memory auto-save/compaction → review prompt).
 - [ ] The `description:` frontmatter still accurately reflects when the skill triggers.
 - [ ] README is updated if behavior changed.
-- [ ] Memory changes, if any, are proposed as patches and are never silently auto-written.
+- [ ] Memory changes, if any, are auto-saved only for durable non-sensitive project context and followed by a review prompt.
 - [ ] `.dual-brain/MEMORY.md` is treated as advisory context, not absolute truth.
 - [ ] Memory compaction, if relevant, keeps decision-value and archives stale noise.
 - [ ] I tested this against at least one real task.

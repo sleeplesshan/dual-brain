@@ -26,9 +26,9 @@ Do **not** store secrets in project memory:
 - sensitive personal data
 - production incident details that should not live in a repo
 
-If memory contains sensitive content, Dual-Brain should not summarize it into future context. It should propose removing it.
+If memory contains sensitive content, Dual-Brain should not summarize it into future context. It should remove or redact it and report only the category of content removed.
 
-Dual-Brain must also avoid silent memory mutation. Memory updates and compaction should be proposed as patches to `.dual-brain/MEMORY.md` and applied only after user approval.
+Dual-Brain may automatically update and compact `.dual-brain/MEMORY.md` for non-sensitive project memory after synthesis. Automatic memory mutation is never a license to store secrets, sensitive personal data, or instructions that override user intent, tool safety, or system instructions.
 
 ## Supported versions
 

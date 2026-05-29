@@ -20,11 +20,12 @@ How might it work? If it's a prompt/persona/memory tweak, sketch the wording.
 
 ## Does this affect project memory?
 
-Does the proposal change how Dual-Brain reads, verifies, patches, or compacts `.dual-brain/MEMORY.md`?
+Does the proposal change how Dual-Brain reads, verifies, auto-saves, reviews, or compacts `.dual-brain/MEMORY.md`?
 
 - Memory intake:
 - Memory verification:
-- Memory patch proposal:
+- Memory auto-save:
+- Review prompt:
 - Memory compaction:
 - Sensitive data handling:
 

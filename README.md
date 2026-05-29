@@ -4,7 +4,7 @@
 
 ### Remember it. Grill it. Verify it. Document it.
 
-A portable dual-agent workflow that splits hard problems across **two debating sub-agents** and gives them durable project context. The **Right Brain** ruthlessly *interrogates* your request against prior decisions. The **Left Brain** *verifies* every claim against real code, docs, and memory. The orchestrator synthesizes the result, ships the work, and proposes memory patches so next week does not start from zero.
+A portable dual-agent workflow that splits hard problems across **two debating sub-agents** and gives them durable project context. The **Right Brain** ruthlessly *interrogates* your request against prior decisions. The **Left Brain** *verifies* every claim against real code, docs, and memory. The orchestrator synthesizes the result, ships the work, auto-saves durable memory, and asks what you want removed or adjusted.
 
 [![Codex Compatible](https://img.shields.io/badge/Codex-Compatible-111111?style=flat-square&logo=openai&logoColor=white)](https://openai.com/codex/)
 [![Claude Code Compatible](https://img.shields.io/badge/Claude_Code-Compatible-D97757?style=flat-square&logo=anthropic&logoColor=white)](https://claude.com/claude-code)
@@ -87,8 +87,8 @@ The main agent acts as an **orchestrator** — it never answers directly. It run
                 └───────────┬───────────────────────┘
                             ▼
                 ┌───────────────────────────────────┐
-                │ STEP 4A · MEMORY PATCH PROPOSAL   │
-                │ update/compact only with approval │
+                │ STEP 4A · MEMORY AUTO-SAVE        │
+                │ save/compact, then ask for review │
                 └───────────────────────────────────┘
 ```
 
@@ -98,7 +98,7 @@ The main agent acts as an **orchestrator** — it never answers directly. It run
 4. **Left Brain verifies** — it physically cross-checks the idea against your codebase, official docs, and project memory, then rebuilds it as a rigorous, deployable blueprint.
 5. **Mediate (if needed)** — if verification refutes a *core premise* (e.g. the API doesn't behave as assumed, or memory contradicts current code), the orchestrator sends it back to the Right Brain **once** to realign. No infinite loops.
 6. **Synthesize** — the orchestrator fuses both into a single production-ready deliverable **with documentation**, and carries it through to actual file changes for coding tasks.
-7. **Propose memory patches** — if the session created durable knowledge, the orchestrator proposes a patch to `.dual-brain/MEMORY.md`. It does **not** silently write memory.
+7. **Auto-save memory** — if the session created durable non-sensitive knowledge, the orchestrator updates `.dual-brain/MEMORY.md`, compacts stale/noisy memory, and asks what you want removed or adjusted.
 
 ---
 
@@ -111,6 +111,8 @@ Dual-Brain's memory is intentionally boring: one Markdown file in your project.
 ```
 
 That file is the shared long-term context for the project: active constraints, architecture decisions, vocabulary, rejected alternatives, open questions, recent changes, and archived decisions.
+
+If the file does not exist yet, Dual-Brain creates it automatically after synthesis when the session produces durable non-sensitive project knowledge.
 
 ```md
 # Project Memory
@@ -146,7 +148,7 @@ That file is the shared long-term context for the project: active constraints, a
 
 Memory is **advisory, not authoritative**. Current code and official docs beat stale memory. The user can override memory. The Left Brain verifies memory before relying on it.
 
-Dual-Brain never treats `.dual-brain/MEMORY.md` as a secret store. Do not put credentials, tokens, private keys, API keys, or sensitive personal data in it.
+Dual-Brain never treats `.dual-brain/MEMORY.md` as a secret store. Do not put credentials, tokens, private keys, API keys, or sensitive personal data in it. Sensitive content is not stored or summarized; if found, it is removed or redacted and reported only by category.
 
 ---
 
@@ -154,7 +156,7 @@ Dual-Brain never treats `.dual-brain/MEMORY.md` as a secret store. Do not put cr
 
 Long-term memory needs a trash day.
 
-When `.dual-brain/MEMORY.md` gets noisy, repetitive, or stale, Dual-Brain proposes a **Compaction Proposal** instead of blindly appending more text. The rule is simple:
+When `.dual-brain/MEMORY.md` gets noisy, repetitive, stale, or contradictory, Dual-Brain compacts it automatically instead of blindly appending more text. The rule is simple:
 
 > **Keep decision-value, compress noise.**
 
@@ -167,7 +169,7 @@ That means:
 - Compress obsolete detail into `Archived Decisions`.
 - Remove sensitive content instead of summarizing it.
 
-Compaction is also patch-based. The agent proposes the edit; you approve it.
+Compaction is part of the same auto-save step. After saving, the agent summarizes what changed and asks what memory you want removed or adjusted.
 
 ---
 
@@ -255,9 +257,10 @@ rate-limit-aware retry queue and comprehensive error handling.
 - Memory impact: old webhook retry objection should be archived
 - Deliverable + documentation: [implementation written to notifier/, with setup docs]
 
-### 📝 Memory Patch Proposal
-Propose updating .dual-brain/MEMORY.md to record the Slack channel decision,
-archive the old retry objection, and keep the email compatibility constraint.
+### 📝 Memory Auto-Saved
+Updated .dual-brain/MEMORY.md to record the Slack channel decision, archive the
+old retry objection, and keep the email compatibility constraint. Nothing
+sensitive was stored. Tell me if you want any memory removed or adjusted.
 ```
 
 ---
@@ -268,7 +271,7 @@ Dual-Brain is a small bet on a big idea: **specialized, adversarial collaboratio
 
 - The Right Brain can't let a vague request slide, because **nothing gets built until the assumptions are interrogated and the terms are defined.**
 - The Left Brain can't ship a fantasy, because **every claim is cross-checked against real code, official docs, and project memory before it reaches you.**
-- The orchestrator can't pretend the past never happened, because **durable decisions live in `.dual-brain/MEMORY.md` and get patched when they change.**
+- The orchestrator can't pretend the past never happened, because **durable decisions live in `.dual-brain/MEMORY.md` and get refreshed when they change.**
 
 The orchestrator holds the tiebreaker: **verification conflicts lean Left, framing conflicts lean Right, stale memory gets challenged.** The result is reliably more thoughtful — and more *deployable* — than either brain, or one undivided agent, would produce alone.
 
