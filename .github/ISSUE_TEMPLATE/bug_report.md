@@ -30,6 +30,7 @@ What actually happened. If memory was skipped, stale memory was trusted, a brain
 
 - Was `.dual-brain/MEMORY.md` present? yes / no
 - Did the skill read it, ignore it, misapply it, or save an incorrect update?
+- Did it choose the wrong tier (Hot / Warm / Cold / Archived) or update `refs`, `last_referenced`, or `last_verified` incorrectly?
 - Did the memory contain stale, contradictory, overgrown, or sensitive content?
 - Did the skill fail to ask what memory should be removed or adjusted after saving?
 

@@ -8,7 +8,7 @@ Thanks for your interest in improving Dual-Brain! 🧠 This is a [Claude Code](h
 - 💡 **Suggest an improvement** — a sharper persona, a better mediation rule, clearer output format, or smarter memory rule.
 - 📖 **Improve docs** — fix the README, add examples, clarify wording or translations.
 - 🧩 **Add a debate pattern** — a variant workflow (e.g., a third reviewer brain, a domain-specific persona).
-- 🗂️ **Improve project memory** — better intake, verification, auto-save, review prompts, or compaction behavior.
+- 🗂️ **Improve project memory** — better weighted intake, verification, auto-save, review prompts, tiering, or compaction behavior.
 
 ## Getting set up
 
@@ -24,7 +24,7 @@ Thanks for your interest in improving Dual-Brain! 🧠 This is a [Claude Code](h
 - The **heart of the skill is `SKILL.md`** — especially the two persona blocks, the memory contract, and the fixed protocol. Tune these carefully and keep the order: memory intake → Right Brain grills → Left Brain verifies → dual synthesis → memory auto-save/compaction → review prompt.
 - Keep the `description:` frontmatter in `SKILL.md` accurate — it's how Claude Code decides when to trigger the skill.
 - If you change behavior, update the README so docs stay in sync.
-- If you touch project memory behavior, document how `.dual-brain/MEMORY.md` is read, verified, auto-saved, reviewed, and compacted.
+- If you touch project memory behavior, document how `.dual-brain/MEMORY.md` is read, tiered, verified, auto-saved, reviewed, and compacted.
 - Never introduce instructions that store or summarize sensitive content. Dual-Brain auto-saves only durable non-sensitive project memory, then asks the user what to remove or adjust.
 - Test your change against at least one real task before opening a PR, and describe what you observed.
 
@@ -33,9 +33,10 @@ Thanks for your interest in improving Dual-Brain! 🧠 This is a [Claude Code](h
 For protocol changes that affect memory, test the important paths:
 
 - **No memory file** — the skill should proceed normally and create `.dual-brain/MEMORY.md` after synthesis only when durable non-sensitive project knowledge exists.
-- **Valid memory** — Right Brain should use prior decisions to ask sharper questions.
-- **Stale or contradictory memory** — Left Brain should verify against code/docs and flag the mismatch.
-- **Overgrown memory** — synthesis should auto-compact memory in a way that keeps decision-value and archives noise.
+- **Valid memory** — Right Brain should use Hot memory first and relevant Warm memory to ask sharper questions.
+- **Stale or contradictory memory** — Left Brain should verify against code/docs, flag the mismatch, and archive or rewrite the item.
+- **Overgrown memory** — synthesis should auto-compact memory in a way that keeps decision-value, demotes stale low-reference context, and archives noise.
+- **Metadata updates** — `refs` and `last_referenced` should change only for memory that materially influenced the task; `last_verified` should change only after real verification.
 - **Sensitive content** — the skill should not reuse, store, or summarize secrets, tokens, keys, credentials, or sensitive personal data; it should remove or redact them and report only their category.
 - **Trivial task** — the skill should not force a memory update when nothing durable changed.
 

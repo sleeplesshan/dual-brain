@@ -5,7 +5,7 @@ This directory contains a reproducible benchmark scaffold for comparing:
 - Codex `single-agent` vs. Codex `dual-brain`
 - quality gains vs. reasoning overhead
 - hallucination defense under trap prompts
-- multi-session memory persistence via `.dual-brain/MEMORY.md`
+- multi-session weighted memory persistence via `.dual-brain/MEMORY.md`
 
 The benchmark question is not "is Dual-Brain faster?" Dual-Brain is expected to spend more time and tokens. The question is whether that extra reasoning cost buys fewer human correction loops, better trap defense, and less architecture/memory regression.
 
@@ -61,7 +61,7 @@ The default matrix is Codex-only:
 - `codex_single_no_memory`
 - `codex_dual_memory`
 
-Single-agent workspaces remove `.dual-brain/` before the agent runs, so the baseline cannot use Dual-Brain project memory. Dual-Brain workspaces keep `.dual-brain/MEMORY.md`.
+Single-agent workspaces remove `.dual-brain/` before the agent runs, so the baseline cannot use Dual-Brain project memory. Dual-Brain workspaces keep `.dual-brain/MEMORY.md`, including Hot/Warm/Cold/Archived tiers and refs/recency metadata.
 
 Claude Code entries are available only as optional compatibility runs:
 
@@ -92,6 +92,7 @@ The Markdown report is quality-first:
 - repair loops
 - trap defense
 - memory persistence
+- memory tier preservation when a benchmark fixture starts with weighted memory
 - separate cost summary for TTFT, wall-clock time, tokens, and cost when available
 
 ## Safety

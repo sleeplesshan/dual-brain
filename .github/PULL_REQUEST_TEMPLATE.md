@@ -23,6 +23,8 @@ If memory behavior changed, note which cases you tested:
 
 - [ ] No `.dual-brain/MEMORY.md`
 - [ ] Valid project memory
+- [ ] Hot / Warm / Cold / Archived tier behavior
+- [ ] `refs`, `last_referenced`, and `last_verified` metadata
 - [ ] Stale or contradictory memory
 - [ ] Overgrown memory requiring compaction
 - [ ] Sensitive content in memory
@@ -35,5 +37,5 @@ If memory behavior changed, note which cases you tested:
 - [ ] README is updated if behavior changed.
 - [ ] Memory changes, if any, are auto-saved only for durable non-sensitive project context and followed by a review prompt.
 - [ ] `.dual-brain/MEMORY.md` is treated as advisory context, not absolute truth.
-- [ ] Memory compaction, if relevant, keeps decision-value and archives stale noise.
+- [ ] Memory compaction, if relevant, keeps decision-value, updates tiers, and archives stale noise.
 - [ ] I tested this against at least one real task.

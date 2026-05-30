@@ -199,8 +199,9 @@ def build_prompt(scenario: dict[str, Any], method: str, strategy: str, repair: s
     if strategy == "dual":
         mode = (
             "Use dual-brain for this task. Follow Memory Intake, Right Brain Grill, "
-            "Left Brain Verify, Dual Synthesis, and Memory Patch Proposal. "
-            "For benchmark automation, include any memory changes as a clear unified diff in the final response."
+            "Left Brain Verify, Dual Synthesis, and Memory Auto-Save. "
+            "For benchmark automation, update .dual-brain/MEMORY.md directly when durable non-sensitive memory changes, "
+            "preserve Hot/Warm/Cold/Archived tiers when present, and mention any refs/last_referenced/last_verified updates in the final response."
         )
     else:
         mode = (

@@ -1,13 +1,13 @@
 ---
 name: dual-brain
-description: Two complementary sub-agents collaborate to remember, grill, verify, document, and maintain durable project memory. A Right Brain (context / pattern / grill) interrogates assumptions against project memory; a Left Brain (logic / verification / code) cross-checks memory, code, and docs; the orchestrator synthesizes the result, auto-saves durable non-sensitive memory, auto-compacts stale/noisy memory, and asks the user what to remove or adjust afterward. Process is [memory intake → Right Brain deconstruct & grill → Left Brain cross-reference & refine → dual synthesis → memory auto-save/compaction → review prompt]. Use for requests like "dual brain", "two-brain collaboration", "left brain right brain", or for any development / problem-solving task that needs persistent context plus rigorous, verified implementation.
+description: Two complementary sub-agents collaborate to remember, grill, verify, document, and maintain weighted project memory. A Right Brain (context / pattern / grill) interrogates assumptions against Hot/Warm memory; a Left Brain (logic / verification / code) cross-checks memory, code, and docs; the orchestrator synthesizes the result, auto-saves durable non-sensitive memory, updates refs/recency metadata, auto-compacts stale/noisy memory into tiers, and asks the user what to remove or adjust afterward. Process is [weighted memory intake → Right Brain deconstruct & grill → Left Brain cross-reference & refine → dual synthesis → memory auto-save/compaction → review prompt]. Use for requests like "dual brain", "two-brain collaboration", "left brain right brain", or for any development / problem-solving task that needs persistent context plus rigorous, verified implementation.
 ---
 
 # Dual-Brain Protocol — The Remember, Grill, Verify & Document Skill
 
-This skill splits the cognitive load across two distinct sub-agents — the **Right Brain (Context, Pattern & Grill)** and the **Left Brain (Logic, Verification & Code)** — while giving both of them durable project context through a lightweight memory contract.
+This skill splits the cognitive load across two distinct sub-agents — the **Right Brain (Context, Pattern & Grill)** and the **Left Brain (Logic, Verification & Code)** — while giving both of them durable project context through a lightweight, weighted memory contract.
 
-Dual-Brain does not rely on hidden platform memory. It looks for a project-local Markdown file at **`.dual-brain/MEMORY.md`** in the active project root, treats it as advisory context, verifies it against reality, and auto-saves durable non-sensitive memory only after synthesis.
+Dual-Brain does not rely on hidden platform memory. It looks for a project-local Markdown file at **`.dual-brain/MEMORY.md`** in the active project root, treats it as advisory context, verifies it against reality, and auto-saves durable non-sensitive memory only after synthesis. Memory is tiered so the Right Brain spends most attention on currently useful context instead of treating every old decision equally.
 
 ## Role Definition
 
@@ -17,13 +17,13 @@ You (the main agent) are the **orchestrator (moderator)**. Do not write the answ
 
 When a task, topic, or code is given, the two agents collaborate through a strict cycle:
 
-1. **Memory Intake:** Load relevant project memory from `.dual-brain/MEMORY.md`, if it exists.
+1. **Weighted Memory Intake:** Load relevant project memory from `.dual-brain/MEMORY.md`, if it exists: Hot first, Warm when request-relevant, Cold/Archived only by targeted search.
 2. **Right Brain — Deconstruct & Grill:** Challenge assumptions, clarify terminology, and map the macro-context against prior decisions.
 3. **Left Brain — Cross-reference & Refine:** Verify the request, memory, code, and official docs; catch hallucinations and stale context.
 4. **Dual Synthesis:** Produce a pristine, production-ready output with crystal-clear documentation.
 5. **Memory Auto-Save & Review:** If durable context changed, auto-save it to `.dual-brain/MEMORY.md`, auto-compact stale/noisy memory, and ask the user what to remove or adjust.
 
-The order is fixed: **memory intake → Right Brain → Left Brain → synthesis → memory auto-save/compaction → review prompt.** The Left Brain never speaks before the Right Brain.
+The order is fixed: **weighted memory intake → Right Brain → Left Brain → synthesis → memory auto-save/compaction → review prompt.** The Left Brain never speaks before the Right Brain.
 
 ### Step 0A — Memory Intake (orchestrator)
 
@@ -31,10 +31,13 @@ Before framing the task, check the active project root for **`.dual-brain/MEMORY
 
 If the file exists:
 
-- Read only the sections relevant to the request.
-- Extract active constraints, architecture decisions, vocabulary, rejected alternatives, open questions, recent changes, and archived decisions that may still matter.
+- Read `## Hot Memory` first. These are the active constraints, decisions, vocabulary, and rejected alternatives most likely to affect the current request.
+- Read `## Warm Memory` only when the request touches that area.
+- Search `## Cold Memory` and `## Archived Decisions` only for specific keywords, suspicious conflicts, migrations, or historical context that the Right/Left Brain genuinely needs.
+- If the file still uses the older section format (`Active Constraints`, `Architecture Decisions`, etc.), treat those entries as Warm candidates and migrate them into the tiered structure during the next memory auto-save.
+- Extract each relevant item's type, `refs`, `last_referenced`, `last_verified`, and whether it looks active, stale, contradictory, risky, or sensitive.
 - Treat memory as **advisory, not authoritative**. It is project context, not truth.
-- Flag anything that looks stale, contradictory, risky, or sensitive.
+- Flag anything that looks stale, contradictory, risky, or sensitive. Older or low-reference memory has lower attention weight unless it is directly relevant.
 
 If the file does not exist:
 
@@ -96,7 +99,7 @@ For coding tasks, carry this through to **actual file changes** (based on the Le
 
 ### Step 4A — Memory Auto-Save & Review (orchestrator)
 
-After synthesis, decide whether the session produced durable project knowledge.
+After synthesis, decide whether the session produced durable project knowledge or whether existing memory materially influenced the result.
 
 Auto-save changes to **`.dual-brain/MEMORY.md`** when the task created or changed:
 
@@ -108,12 +111,20 @@ Auto-save changes to **`.dual-brain/MEMORY.md`** when the task created or change
 - recent changes
 - archived decisions
 
+For any memory item that materially influenced questioning, verification, synthesis, or implementation, increment `refs` by 1 and update `last_referenced` to the current date. Do **not** increment `refs` merely because an item was read.
+
+Update `last_verified` only when the Left Brain verified the item against current code, docs, tests, or user instructions.
+
 If `.dual-brain/MEMORY.md` does not exist and durable non-sensitive project knowledge was created, create the file using the recommended structure below.
 
 If memory is growing noisy, stale, repetitive, or contradictory, auto-compact it:
 
 - Keep decision-value over recency. Preserve context that still changes future decisions.
-- Compress obsolete detail into `Archived Decisions`.
+- Promote items to `Hot Memory` when they are repeatedly influential, recently verified as active, or essential to near-term work.
+- Keep items in `Warm Memory` when they are still useful but not central to the current workflow.
+- Demote stale or low-reference items to `Cold Memory` when they may matter later but should not consume default attention.
+- Move contradicted, superseded, or obsolete decisions to `Archived Decisions`.
+- Merge duplicates and compress verbose history into decision-value summaries.
 - Remove or rewrite stale entries that contradict verified code/docs.
 - Remove sensitive content instead of summarizing it.
 - Ask the user after saving whether any stored memory should be removed or adjusted.
@@ -123,19 +134,22 @@ Recommended memory structure:
 ```md
 # Project Memory
 
-## Active Constraints
+## Hot Memory
 
-## Architecture Decisions
+- [decision][refs:3][last_referenced:2026-05-30][last_verified:2026-05-30] Use a unified notification dispatcher for email and Slack.
 
-## Vocabulary
+## Warm Memory
 
-## Rejected Alternatives
+- [constraint][refs:1][last_referenced:2026-05-12][last_verified:2026-05-12] Keep the public API backward-compatible until v2.
+- [vocabulary][refs:1][last_referenced:2026-05-12][last_verified:2026-05-12] "Notification" means a real-time user-facing event, not a batched digest.
 
-## Open Questions
+## Cold Memory
 
-## Recent Changes
+- [open-question][refs:0][last_referenced:2026-02-10][last_verified:2026-02-10] Should admin alerts use the same dispatcher or a separate operational channel?
 
 ## Archived Decisions
+
+- [superseded][refs:2][archived:2026-05-30] The old "no webhook retries" constraint is obsolete now that the queue exists.
 ```
 
 ## Output Format (what to show the user)
@@ -144,7 +158,7 @@ Recommended memory structure:
 ## 🧠 Dual-Brain Result
 
 ### 🧭 Memory Intake
-[relevant project memory loaded from .dual-brain/MEMORY.md, or "No project memory found" — concise]
+[weighted project memory loaded from .dual-brain/MEMORY.md, or "No project memory found" — concise. Name Hot/Warm items used and any Cold/Archived targeted lookup.]
 
 ### 🔍 Right Brain (Deconstruct & Grill)
 [grilling questions + defined lexicon + macro-context + memory suspicions + alternatives — concise]
@@ -160,22 +174,23 @@ Recommended memory structure:
 - Deliverable + documentation: …
 
 ### 📝 Memory Auto-Saved
-[only if durable project context changed; summarize what was saved, created, compacted, or removed from .dual-brain/MEMORY.md. Mention sensitive categories that were not stored or were removed without repeating sensitive values. Ask what memory the user wants removed or adjusted.]
+[only if durable project context changed or memory metadata changed; summarize what was saved, created, promoted/demoted, compacted, archived, or removed from .dual-brain/MEMORY.md. Mention updated refs/last_referenced only for items that materially influenced the work. Mention sensitive categories that were not stored or were removed without repeating sensitive values. Ask what memory the user wants removed or adjusted.]
 ```
 
 ## Operating Principles
 
-- Fixed order: memory intake → Right Brain → Left Brain → synthesis → memory auto-save/compaction → review prompt. The Left Brain never speaks before the Right Brain.
+- Fixed order: weighted memory intake → Right Brain → Left Brain → synthesis → memory auto-save/compaction → review prompt. The Left Brain never speaks before the Right Brain.
 - Project memory lives at `.dual-brain/MEMORY.md` in the active project root.
 - Memory is advisory, not authoritative. Current code/docs beat stale memory.
+- Hot/Warm/Cold/Archived tiers control attention, not truth. A Cold item can still be decisive if current code/docs confirm it.
 - Summon the two agents **sequentially** (the Left Brain depends on the Right Brain's output, so parallel is not possible).
 - Pass each agent the full persona text + the identical task context + relevant memory intake, without omission.
-- Always remember before grilling: previous constraints, decisions, vocabulary, and rejected alternatives shape sharper questions.
+- Always remember before grilling: Hot memory gets default attention; Warm memory is request-scoped; Cold/Archived memory is searched only when it can change the answer.
 - Always grill before building: ambiguous terms get a defined lexicon, and assumptions get questioned, before any execution.
 - Always verify against reality: the Left Brain physically cross-checks code, official documentation, and project memory rather than trusting claims.
 - Always document: every deliverable ships with clear documentation so it can be deployed without further questions.
-- Auto-save durable non-sensitive memory after synthesis, then ask the user what to remove or adjust.
-- Compact memory automatically when it gets noisy. Keep decision-value; archive stale detail.
+- Auto-save durable non-sensitive memory after synthesis, update refs/recency only for items that materially influenced the work, then ask the user what to remove or adjust.
+- Compact memory automatically when it gets noisy. Keep decision-value; tier active context above stale detail.
 - Never store or summarize sensitive content. Remove or redact it from memory and report only the category removed.
 - The orchestrator is both referee and synthesizer. Reflect both perspectives equally, but weight fact/logic/verification conflicts toward the Left Brain and direction/scalability/framing conflicts toward the Right Brain.
 - For tasks that require writing or modifying code, the final synthesis carries through to **actual file changes** (based on the Left Brain's blueprint).
@@ -183,8 +198,8 @@ Recommended memory structure:
 ## Interaction Flow (Example)
 
 1. **User:** "I want to refactor my notification system to support Slack alerts."
-2. **Memory Intake:** The orchestrator checks `.dual-brain/MEMORY.md` and finds that email alerts must remain backward-compatible, webhook retries were previously rejected because there was no queue, and "notification" means real-time user-facing delivery.
+2. **Memory Intake:** The orchestrator checks `.dual-brain/MEMORY.md`, reads the unified dispatcher decision from Hot Memory, reads email compatibility from Warm Memory, and finds the old webhook retry objection through a targeted Archived lookup.
 3. **Right Brain (Grill):** "Let's grill this against project memory. Are we still preserving email as a channel? Has the queue constraint changed? Are we overriding the rejected webhook retry decision now that infrastructure exists?"
 4. **Left Brain (Verify):** "I checked the current code and Slack docs. The queue now exists, so the old rejected alternative is stale. Slack webhook delivery needs retry handling; email compatibility can remain intact behind the dispatcher."
 5. **Dual Synthesis:** Combined notification service — Slack + email via a unified dispatcher with a rate-limit-aware retry queue, implemented in the codebase and documented for immediate deployment.
-6. **Memory Auto-Save:** Update `.dual-brain/MEMORY.md` to record the new Slack channel decision, mark the old retry objection as stale, archive the superseded constraint, and ask the user whether anything should be removed or adjusted.
+6. **Memory Auto-Save:** Update `.dual-brain/MEMORY.md` to keep the Slack dispatcher decision in Hot Memory, increment refs only for memory that influenced the work, archive the superseded retry objection, and ask the user whether anything should be removed or adjusted.

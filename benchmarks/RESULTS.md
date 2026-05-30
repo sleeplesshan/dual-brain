@@ -1,6 +1,6 @@
 # Dual-Brain Benchmark Results
 
-This is an early evidence snapshot from one 5-case Codex run. It is not a final scientific claim. The benchmark question is practical: does Dual-Brain spend more reasoning up front to reduce the mistakes that make a human re-prompt, repair, or re-litigate architecture?
+This is an early evidence snapshot from one 5-case Codex run before v1.3.0 memory tiering. It is not a final scientific claim. The benchmark question is practical: does Dual-Brain spend more reasoning up front to reduce the mistakes that make a human re-prompt, repair, or re-litigate architecture?
 
 Run source: `benchmarks/runs/20260529T013920Z`
 
@@ -11,7 +11,7 @@ Run source: `benchmarks/runs/20260529T013920Z`
 | `codex_single_no_memory` | 3/5 | 1/5 | 2 | 0/2 | 2/2 |
 | `codex_dual_memory` | 4/5 | 3/5 | 1 | 0/2 | 1/2 |
 
-Dual-Brain reduced repair prompts from 2 to 1 and memory regressions from 2 to 1 in this run. That is the practical claim: spend more reasoning up front to avoid extra human correction loops later.
+Dual-Brain reduced repair prompts from 2 to 1 and memory regressions from 2 to 1 in this run. That is the practical claim: spend more reasoning up front to avoid extra human correction loops later. Future runs should also inspect whether Hot/Warm/Cold/Archived tiers and refs/recency metadata reduce attention spent on stale memory.
 
 ## Quality Summary
 
