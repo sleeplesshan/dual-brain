@@ -39,7 +39,6 @@ The latest version on the `main` branch is supported. There are no separate rele
 If you discover a security concern — including prompt-injection risks, unsafe memory handling, or instructions that could cause unintended agent behavior — please report it privately:
 
 - **Preferred:** open a [private security advisory](https://github.com/sleeplesshan/dual-brain/security/advisories/new) on GitHub.
-- **Or email:** **qwod123@gmail.com**
 
 Please include:
 
