@@ -2,7 +2,7 @@
 
 ## About this project
 
-Dual-Brain is a [Claude Code](https://claude.com/claude-code) skill. It consists of Markdown instructions (`SKILL.md`) that guide an AI agent's behavior — it ships **no executable code, no dependencies, and no network services**. The attack surface is therefore minimal.
+Dual-Brain is a portable Markdown skill for agentic coding environments such as Codex and Claude Code. It consists of instructions (`SKILL.md`) that guide an AI agent's behavior — it ships **no executable code, no dependencies, and no network services**. The attack surface is therefore minimal.
 
 That said, because the skill instructs an agent that can read files and run tools on your machine, we take prompt-level concerns seriously (for example, wording that could lead an agent to take unintended actions).
 

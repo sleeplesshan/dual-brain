@@ -1,6 +1,6 @@
 # Contributing to Dual-Brain
 
-Thanks for your interest in improving Dual-Brain! 🧠 This is a [Claude Code](https://claude.com/claude-code) skill — its "source" is the persona prompts, memory contract, and protocol in [`SKILL.md`](SKILL.md). Most contributions are prompt-engineering improvements, docs, memory behavior, or new debate patterns.
+Thanks for your interest in improving Dual-Brain! 🧠 This is a portable Markdown skill for agentic coding environments such as Codex and Claude Code. Its "source" is the persona prompts, memory contract, and protocol in [`SKILL.md`](SKILL.md). Most contributions are prompt-engineering improvements, docs, memory behavior, or new debate patterns.
 
 ## Ways to contribute
 
@@ -15,14 +15,14 @@ Thanks for your interest in improving Dual-Brain! 🧠 This is a [Claude Code](h
 1. Fork and clone the repo.
 2. Install the skill locally so you can test it:
    ```bash
-   git clone https://github.com/<your-fork>/dual-brain.git ~/.claude/skills/dual-brain
+   git clone https://github.com/<your-fork>/dual-brain.git ~/.codex/skills/dual-brain
    ```
-3. Open Claude Code and invoke the skill (e.g. `use dual brain to ...`) to see your changes in action.
+3. Open Codex, Claude Code, or another compatible agentic coding environment and invoke the skill (e.g. `use dual brain to ...`) to see your changes in action.
 
 ## Making changes
 
 - The **heart of the skill is `SKILL.md`** — especially the two persona blocks, the memory contract, and the fixed protocol. Tune these carefully and keep the order: memory intake → Right Brain grills → Left Brain verifies → dual synthesis → memory auto-save/compaction → review prompt.
-- Keep the `description:` frontmatter in `SKILL.md` accurate — it's how Claude Code decides when to trigger the skill.
+- Keep the `description:` frontmatter in `SKILL.md` accurate — compatible agents use it to decide when to trigger the skill.
 - If you change behavior, update the README so docs stay in sync.
 - If you touch project memory behavior, document how `.dual-brain/MEMORY.md` is read, tiered, verified, auto-saved, reviewed, and compacted.
 - Never introduce instructions that store or summarize sensitive content. Dual-Brain auto-saves only durable non-sensitive project memory, then asks the user what to remove or adjust.
