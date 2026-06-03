@@ -10,7 +10,7 @@ A portable dual-agent workflow that splits hard problems across **two reusable d
 [![Claude Code Compatible](https://img.shields.io/badge/Claude_Code-Compatible-D97757?logo=anthropic&logoColor=white)](https://claude.com/claude-code)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#-contributing)
-[![Latest: v1.3.0](https://img.shields.io/badge/latest-v1.3.0-4b5563)](CHANGELOG.md)
+[![Latest: v1.4.0](https://img.shields.io/badge/latest-v1.4.0-4b5563)](CHANGELOG.md)
 
 </div>
 
