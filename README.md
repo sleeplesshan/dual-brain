@@ -4,7 +4,7 @@
 
 ### Remember it. Grill it. Verify it. Document it.
 
-A portable dual-agent workflow that splits hard problems across **two debating sub-agents** and gives them weighted project context. The **Right Brain** ruthlessly *interrogates* your request against the most relevant prior decisions. The **Left Brain** *verifies* every claim against real code, docs, and memory. The orchestrator synthesizes the result, ships the work, auto-saves durable memory, updates recency/reference metadata, and asks what you want removed or adjusted.
+A portable dual-agent workflow that splits hard problems across **two reusable debating sub-agents** and gives them weighted project context. The **Right Brain** ruthlessly *interrogates* your request against the most relevant prior decisions. The **Left Brain** *verifies* every claim against real code, docs, and memory. The orchestrator reuses active brains when available, synthesizes the result, ships the work, auto-saves durable memory, updates recency/reference metadata, and asks what you want removed or adjusted.
 
 [![Codex Compatible](https://img.shields.io/badge/Codex-Compatible-111111?logo=openai&logoColor=white)](https://openai.com/codex/)
 [![Claude Code Compatible](https://img.shields.io/badge/Claude_Code-Compatible-D97757?logo=anthropic&logoColor=white)](https://claude.com/claude-code)
@@ -24,7 +24,7 @@ A single AI agent tends to fail in one of three ways. It either:
 - 🔬 **Drowns in detail** — gets lost in syntax and corner cases while missing the simpler, smarter path and shipping nothing you can actually use, or
 - 🕳️ **Forgets the project** — re-litigates decisions you already settled last week because the session ended and the context disappeared.
 
-The fix isn't a better single prompt — it's **structured tension plus weighted persistent project memory**. Dual-Brain bakes that in. It runs a strict debate between two specialists with opposite instincts, feeds them Hot/Warm memory when it exists, verifies that memory against reality, then synthesizes a single production-ready result *with documentation*.
+The fix isn't a better single prompt — it's **structured tension plus weighted persistent project memory**. Dual-Brain bakes that in. It runs a strict debate between two reusable specialists with opposite instincts, feeds them Hot/Warm memory when it exists, verifies that memory against reality, then synthesizes a single production-ready result *with documentation*.
 
 > **The orchestrator remembers it. Right Brain grills it. Left Brain verifies it. The final answer ships it — documented.**
 
@@ -55,6 +55,11 @@ The main agent acts as an **orchestrator** — it never answers directly. It run
                         ┌─────────────────────────────┐
                         │  STEP 0B · ORCHESTRATOR     │
                         │  frames the problem         │
+                        └──────────────┬──────────────┘
+                                       ▼
+                        ┌─────────────────────────────┐
+                        │ STEP 0C · BRAIN REUSE CHECK │
+                        │ reuse active, spawn missing │
                         └──────────────┬──────────────┘
                                        │  (same context to both)
                                        ▼
@@ -95,11 +100,14 @@ The main agent acts as an **orchestrator** — it never answers directly. It run
 
 1. **Remember** — the orchestrator checks `.dual-brain/MEMORY.md` in the active project root, reads Hot memory first, reads Warm memory when request-relevant, and searches Cold/Archived memory only when needed.
 2. **Frame** — it distills your request into one shared paragraph, including the useful memory context.
-3. **Right Brain grills** — it refuses to take the request or memory at face value: it interrogates assumptions, defines every ambiguous term, maps the macro-context, and flags stale or contradictory memory.
-4. **Left Brain verifies** — it physically cross-checks the idea against your codebase, official docs, and project memory, then rebuilds it as a rigorous, deployable blueprint.
-5. **Mediate (if needed)** — if verification refutes a *core premise* (e.g. the API doesn't behave as assumed, or memory contradicts current code), the orchestrator sends it back to the Right Brain **once** to realign. No infinite loops.
-6. **Synthesize** — the orchestrator fuses both into a single production-ready deliverable **with documentation**, and carries it through to actual file changes for coding tasks.
-7. **Auto-save memory** — if the session created durable non-sensitive knowledge, the orchestrator updates `.dual-brain/MEMORY.md`, refreshes refs/recency metadata for influential items, compacts stale/noisy memory into tiers, and asks what you want removed or adjusted.
+3. **Reuse active brains** — when the platform exposes reusable agent handles, the orchestrator reuses the active Right/Left Brain agents and spawns only missing or unusable brains.
+4. **Right Brain grills** — it refuses to take the request or memory at face value: it interrogates assumptions, defines every ambiguous term, maps the macro-context, and flags stale or contradictory memory.
+5. **Left Brain verifies** — it physically cross-checks the idea against your codebase, official docs, and project memory, then rebuilds it as a rigorous, deployable blueprint.
+6. **Mediate (if needed)** — if verification refutes a *core premise* (e.g. the API doesn't behave as assumed, or memory contradicts current code), the orchestrator sends it back to the Right Brain **once** to realign. No infinite loops.
+7. **Synthesize** — the orchestrator fuses both into a single production-ready deliverable **with documentation**, and carries it through to actual file changes for coding tasks.
+8. **Auto-save memory** — if the session created durable non-sensitive knowledge, the orchestrator updates `.dual-brain/MEMORY.md`, refreshes refs/recency metadata for influential items, compacts stale/noisy memory into tiers, and asks what you want removed or adjusted.
+
+Dual-Brain does not intentionally grow an unbounded tree of sub-agents. Active brains are reused inside the current conversation/runtime when possible; cross-session continuity comes from `.dual-brain/MEMORY.md`, not stored agent IDs.
 
 ---
 
@@ -300,7 +308,7 @@ stored. Tell me if you want any memory removed or adjusted.
 
 ## 🧩 Why it works (the design philosophy)
 
-Dual-Brain is a small bet on a big idea: **specialized, adversarial collaboration beats a single generalist pass.** By forcing the order — *remember first, grill second, verify third, synthesize last* — it neutralizes the failure modes that plague solo agents:
+Dual-Brain is a small bet on a big idea: **specialized, adversarial collaboration beats a single generalist pass.** By forcing the order — *remember first, reuse active brains, grill second, verify third, synthesize last* — it neutralizes the failure modes that plague solo agents:
 
 - The Right Brain can't let a vague request slide, because **nothing gets built until the assumptions are interrogated and the terms are defined.**
 - The Left Brain can't ship a fantasy, because **every claim is cross-checked against real code, official docs, and project memory before it reaches you.**
