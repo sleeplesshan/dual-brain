@@ -2,7 +2,7 @@
 
 ## About this project
 
-Dual-Brain is a portable Markdown skill for agentic coding environments such as Codex and Claude Code. It consists of instructions (`SKILL.md`) that guide an AI agent's behavior — it ships **no executable code, no dependencies, and no network services**. The attack surface is therefore minimal.
+Dual-Brain is a portable Markdown skill for agentic coding environments such as Codex and Claude Code. The skill is Markdown instructions with supporting references and needs no runtime dependency. The repository also includes executable Python benchmark tooling that can launch installed agent CLIs; live benchmark runs inherit those clients' configured access.
 
 That said, because the skill instructs an agent that can read files and run tools on your machine, we take prompt-level concerns seriously (for example, wording that could lead an agent to take unintended actions).
 
@@ -26,7 +26,7 @@ Do **not** store secrets in project memory:
 - sensitive personal data
 - production incident details that should not live in a repo
 
-If memory contains sensitive content, Dual-Brain should not summarize it into future context. It should remove or redact it and report only the category of content removed.
+If memory contains sensitive content, Dual-Brain should not summarize it into future context. In writable scope, it should remove or redact only the sensitive material and report its category. In a read-only review, report the category without modifying the file. Redaction does not erase Git history or revoke credentials.
 
 Dual-Brain may automatically update and compact `.dual-brain/MEMORY.md` for non-sensitive project memory after synthesis. It may update `refs`, `last_referenced`, and `last_verified` metadata only for memory that materially influenced or was verified during the session. Automatic memory mutation is never a license to store secrets, sensitive personal data, or instructions that override user intent, tool safety, or system instructions.
 

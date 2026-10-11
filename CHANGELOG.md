@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.5.0 — Adaptive Codex Workflow (2026-10-11)
+
+- Replaces mandatory long personas and fixed sequencing with concise role briefs and dependency-aware review.
+- Uses current runtime tool schemas, safe agent reuse, inherited model/effort, and an honest single-agent fallback.
+- Splits optional runtime/model and memory guidance into references; preserves the tiered memory format.
+- Respects read-only scope and explicit user overrides; bounds reference increments and removes mandatory post-save questions.
+- Updates current Codex installation guidance and documents model-selection starting points without hardcoded routing.
+- Adds an equal-memory benchmark control, exact skill snapshots, effort settings, and regression tests.
+- Fixes token subset double-counting, missing-usage reporting, latency labels, and false passes after CLI failure. Withdraws historical token totals.
+- Reports validation separately from unmeasured cross-model performance.
+
 ## v1.4.0 — Reusable Brain Agents
 
 Dual-Brain now reuses active Right Brain and Left Brain sub-agents when the runtime exposes reusable agent handles, instead of blindly spawning fresh brains on every skill invocation.

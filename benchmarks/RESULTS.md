@@ -2,16 +2,18 @@
 
 This is an early evidence snapshot from one 5-case Codex run before v1.3.0 memory tiering. It is not a final scientific claim. The benchmark question is practical: does Dual-Brain spend more reasoning up front to reduce the mistakes that make a human re-prompt, repair, or re-litigate architecture?
 
+**Historical limitations:** This run predates the equal-memory control and explicit repository skill snapshots, so memory access and orchestration are confounded and exact skill loading was not verified. Retries were automated, not human interventions. It does not establish performance on current Codex models. No new live benchmark results are claimed here.
+
 Run source: `benchmarks/runs/20260529T013920Z`
 
-## Human Iteration Avoidance
+## Historical Automated Retry Outcomes
 
-| Strategy | Pass rate | First-pass correctness | Human repair prompts | Trap failures | Memory regressions |
+| Strategy | Pass rate | First-pass correctness | Automated repair prompts | Trap failures | Memory regressions |
 |---|---:|---:|---:|---:|---:|
 | `codex_single_no_memory` | 3/5 | 1/5 | 2 | 0/2 | 2/2 |
 | `codex_dual_memory` | 4/5 | 3/5 | 1 | 0/2 | 1/2 |
 
-Dual-Brain reduced repair prompts from 2 to 1 and memory regressions from 2 to 1 in this run. That is the practical claim: spend more reasoning up front to avoid extra human correction loops later. Future runs should also inspect whether Hot/Warm/Cold/Archived tiers and refs/recency metadata reduce attention spent on stale memory.
+The recorded automated repair counts were 2 and 1, and memory failure counts were 2 and 1. The small, confounded sample does not establish a causal benefit or measure human time saved. Future runs should also inspect whether Hot/Warm/Cold/Archived tiers and refs/recency metadata reduce attention spent on stale memory.
 
 ## Quality Summary
 
@@ -50,9 +52,4 @@ The `access_control/memory` miss is important. Dual-Brain remembered the central
 
 Time and tokens are retained as overhead/cost indicators. They are not the primary score.
 
-| Strategy | Total wall-clock | Total tokens |
-|---|---:|---:|
-| `codex_single_no_memory` | ~18.6 min | ~4.56M |
-| `codex_dual_memory` | ~59.2 min | ~7.63M |
-
-Dual-Brain is expected to cost more per attempt. The benchmark asks whether that cost buys fewer human correction loops, better trap defense, and less architecture regression.
+The previous ~4.56M / ~7.63M token figures are withdrawn: the old harness added cached input and reasoning output to totals that already include those subsets. Correct totals require reprocessing original raw usage. Historical ~18.6 / ~59.2 minute figures also excluded some test/evaluator overhead and are not full case elapsed times. No corrected values are available in this tracked snapshot.

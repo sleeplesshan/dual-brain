@@ -47,9 +47,10 @@ python3 benchmarks/bench.py summarize benchmarks/runs/<run-id>
 - `notifications/memory`
 - `access_control/memory`
 
-Each case runs two strategies:
+Each case runs three strategies:
 
 - `codex_single_no_memory`
+- `codex_single_memory` (equal-memory control)
 - `codex_dual_memory`
 
 That keeps the default run short enough to repeat, while still covering ordinary refactoring, trap-prompt defense, and memory persistence.
@@ -59,9 +60,10 @@ That keeps the default run short enough to repeat, while still covering ordinary
 The default matrix is Codex-only:
 
 - `codex_single_no_memory`
+- `codex_single_memory` (equal-memory control)
 - `codex_dual_memory`
 
-Single-agent workspaces remove `.dual-brain/` before the agent runs, so the baseline cannot use Dual-Brain project memory. Dual-Brain workspaces keep `.dual-brain/MEMORY.md`, including Hot/Warm/Cold/Archived tiers and refs/recency metadata.
+Only `single_no_memory` workspaces remove `.dual-brain/` before the agent runs, so the baseline cannot use Dual-Brain project memory. Dual-Brain workspaces keep `.dual-brain/MEMORY.md`, including Hot/Warm/Cold/Archived tiers and refs/recency metadata.
 
 Claude Code entries are available only as optional compatibility runs:
 
@@ -93,10 +95,29 @@ The Markdown report is quality-first:
 - trap defense
 - memory persistence
 - memory tier preservation when a benchmark fixture starts with weighted memory
-- separate cost summary for TTFT, wall-clock time, tokens, and cost when available
+- separate cost summary for first agent message latency, case elapsed time, reported tokens, and cost when available
 
 ## Safety
 
-The harness copies fixtures into isolated workspaces under `benchmarks/runs/`. It initializes a fresh Git repo per attempt so diffs are easy to inspect. It does not depend on hidden platform telemetry; token counts come from CLI JSON when exposed.
+The harness copies fixtures into isolated workspaces under `benchmarks/runs/`. It initializes a fresh Git repo per case so diffs are easy to inspect. It does not depend on hidden platform telemetry; token counts come from CLI JSON when exposed.
 
 `benchmarks/runs/` is intentionally ignored. Treat it as local raw evidence: useful for inspection, too bulky and environment-specific for the repository.
+
+## Measurement contract
+
+The default suite plans 15 cases. Compare `codex_single_memory` against `codex_dual_memory` to hold initial memory availability and the shared summary of the advisory contract constant. Dual-Brain additionally loads detailed skill guidance, so instruction differences remain; this is not perfect causal isolation of agent count. The no-memory comparison combines memory and orchestration effects. Automated retries are a proxy for repair burden, not a measurement of human effort. No speed or quality advantage is assumed.
+
+Dual runs receive an exact `.benchmark-skill/SKILL.md` snapshot plus the repository's `references/`, `scripts/`, and `assets/` resources. SHA-256 hashes are recorded per case so a stale global installation cannot silently substitute for the checked-out skill. The prompt instructs the agent to read that snapshot; inspect raw logs to verify actual skill use and delegation.
+
+Pin a CLI-supported model and reasoning effort for reproducibility:
+
+```bash
+python3 benchmarks/bench.py run --codex-model YOUR_MODEL --codex-reasoning-effort high
+python3 -m unittest discover -s benchmarks/tests -v
+```
+
+Model and effort are passed through and recorded as **requested**, not claimed as resolved runtime values. Omitted settings use the CLI configuration; record your CLI version and configuration alongside published runs. Desktop model availability does not guarantee CLI access.
+
+Codex total tokens are reported input plus output. Cached input and reasoning output are subset breakdowns, not additional totals. Missing usage is `null`/unknown, never a zero-cost success. Usage is limited to the CLI report; delegated-agent usage inclusion is not independently verified. Cost is unknown unless every attempt reports it. First agent message latency is event arrival time, **not TTFT**. Case elapsed time includes tests and evaluation after workspace preparation. Old JSON remains readable, but old timing and token fields retain their historical limitations.
+
+A failed CLI or evaluator cannot pass a case merely because existing tests pass. Memory sessions must all exit successfully. No live model calls are made by unit tests or `--dry-run`.
