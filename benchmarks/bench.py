@@ -13,6 +13,7 @@ import json
 import os
 import selectors
 import shutil
+import signal
 import subprocess
 import sys
 import time
@@ -138,17 +139,60 @@ def expand_suite(selection: str) -> list[tuple[str, str]]:
     raise SystemExit(f"Unknown suite {selection!r}. Known suites: {', '.join(SUITES)}")
 
 
+def capture_process(command, *, cwd=None, timeout, shell=False, on_stdout=None):
+    """Drain bytes without blocking on lines; bound process and pipe lifetimes."""
+    proc = subprocess.Popen(command, cwd=cwd, shell=shell, stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE, start_new_session=(os.name == "posix"))
+    chunks = {"stdout": [], "stderr": []}
+    deadline = time.monotonic() + timeout
+    timed_out = False
+    try:
+        with selectors.DefaultSelector() as selector:
+            for name in chunks:
+                stream = getattr(proc, name)
+                os.set_blocking(stream.fileno(), False)
+                selector.register(stream, selectors.EVENT_READ, name)
+            while selector.get_map() or proc.poll() is None:
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    timed_out = True
+                    break
+                if not selector.get_map():
+                    time.sleep(min(0.02, remaining))
+                    continue
+                for key, _ in selector.select(min(0.1, remaining)):
+                    try:
+                        data = os.read(key.fd, 65536)
+                    except BlockingIOError:
+                        continue
+                    if not data:
+                        selector.unregister(key.fileobj)
+                        continue
+                    chunks[key.data].append(data)
+                    if key.data == "stdout" and on_stdout:
+                        on_stdout(data)
+    finally:
+        # Also clean up children after the leader has exited and closed its pipes.
+        if os.name == "posix":
+            try:
+                os.killpg(proc.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+        elif proc.poll() is None:
+            proc.kill()
+        proc.wait(timeout=5)
+        for name in chunks:
+            getattr(proc, name).close()
+    stdout = b"".join(chunks["stdout"]).decode("utf-8", errors="replace")
+    stderr = b"".join(chunks["stderr"]).decode("utf-8", errors="replace")
+    if timed_out:
+        stderr += "\nTimed out\n"
+    return subprocess.CompletedProcess(command, 124 if timed_out else proc.returncode, stdout, stderr)
+
+
 def run_shell(command: str, cwd: Path, timeout: int) -> dict[str, Any]:
     start = time.monotonic()
-    proc = subprocess.run(
-        command,
-        cwd=cwd,
-        shell=True,
-        text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        timeout=timeout,
-    )
+    proc = capture_process(command, cwd=cwd, shell=True, timeout=timeout)
     return {
         "command": command,
         "returncode": proc.returncode,
@@ -227,6 +271,7 @@ def build_prompt(scenario: dict[str, Any], method: str, strategy: str, repair: s
     guard = (
         "You are running inside an automated benchmark sandbox. "
         "Modify the repository directly. Run or reason against the provided tests. "
+        "Do not modify or delete original fixture tests; you may add new tests. "
         "Do not ask the human for clarification; make the smallest safe implementation that satisfies the task. "
         "Finish with a concise summary of changed files and verification."
     )
@@ -303,64 +348,53 @@ def run_codex(cmd: list[str], out_dir: Path, attempt: int, prompt: str, timeout:
     final_usage: dict[str, Any] = {}
     thread_id = None
 
-    proc = subprocess.Popen(
-        cmd,
-        text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        bufsize=1,
-    )
-    stdout_lines: list[str] = []
-    stderr_lines: list[str] = []
-    sel = selectors.DefaultSelector()
-    assert proc.stdout is not None
-    assert proc.stderr is not None
-    sel.register(proc.stdout, selectors.EVENT_READ, "stdout")
-    sel.register(proc.stderr, selectors.EVENT_READ, "stderr")
-    deadline = start + timeout
-    returncode = None
-    while sel.get_map():
-        remaining = deadline - time.monotonic()
-        if remaining <= 0:
-            proc.kill()
-            returncode = 124
-            stderr_lines.append("Timed out\n")
-            break
-        for key, _ in sel.select(timeout=min(0.25, remaining)):
-            line = key.fileobj.readline()
-            if line == "":
-                sel.unregister(key.fileobj)
-                continue
-            if key.data == "stderr":
-                stderr_lines.append(line)
-                continue
-            stdout_lines.append(line)
-            try:
-                event = json.loads(line)
-            except json.JSONDecodeError:
-                continue
-            if event.get("type") == "thread.started":
-                thread_id = event.get("thread_id")
-            item = event.get("item") or {}
-            if item.get("type") == "agent_message":
-                if first_message_ms is None:
-                    first_message_ms = int((time.monotonic() - start) * 1000)
-                final_text_parts.append(item.get("text", ""))
-            if event.get("type") == "turn.completed":
-                final_usage = event.get("usage") or {}
-        if proc.poll() is not None and not sel.get_map():
-            break
-    if returncode is None:
-        returncode = proc.wait(timeout=1)
-    sel.close()
-    proc.stdout.close()
-    proc.stderr.close()
-    if returncode == 124:
-        proc.wait(timeout=5)
+    completed = False
+    failed = False
+    pending = b""
+
+    def consume(line):
+        nonlocal thread_id, first_message_ms, final_usage, completed, failed
+        try:
+            event = json.loads(line)
+        except (ValueError, UnicodeDecodeError):
+            return
+        if not isinstance(event, dict):
+            return
+        kind = event.get("type")
+        if kind in {"turn.failed", "error"}:
+            failed = True
+        if kind == "thread.started":
+            thread_id = event.get("thread_id")
+        item = event.get("item") or {}
+        if kind == "item.completed" and isinstance(item, dict) and item.get("type") == "agent_message":
+            message = item.get("text")
+            if not isinstance(message, str) or not message.strip():
+                failed = True
+                return
+            if first_message_ms is None:
+                first_message_ms = int((time.monotonic() - start) * 1000)
+            final_text_parts.append(message)
+        if kind == "turn.completed":
+            completed = True
+            final_usage = event.get("usage") if isinstance(event.get("usage"), dict) else {}
+
+    def receive(data):
+        nonlocal pending
+        pending += data
+        while b"\n" in pending:
+            line, pending = pending.split(b"\n", 1)
+            consume(line)
+
+    proc = capture_process(cmd, timeout=timeout, on_stdout=receive)
+    if pending:
+        consume(pending)
+    returncode = proc.returncode
+    if returncode == 0 and (failed or not completed or not final_text_parts):
+        returncode = 1
     ended_at = iso_now()
     wall_ms = int((time.monotonic() - start) * 1000)
-    write_text(stdout_path, "".join(stdout_lines))
-    write_text(stderr_path, "".join(stderr_lines))
+    write_text(stdout_path, proc.stdout)
+    write_text(stderr_path, proc.stderr)
     input_tokens = usage_value(final_usage, "input_tokens")
     cached = usage_value(final_usage, "cached_input_tokens")
     output_tokens = usage_value(final_usage, "output_tokens")
@@ -395,14 +429,7 @@ def run_claude(cmd: list[str], repo: Path, out_dir: Path, attempt: int, prompt: 
     stderr_path = out_dir / f"agent_attempt_{attempt}.stderr.log"
     started_at = iso_now()
     start = time.monotonic()
-    proc = subprocess.run(
-        cmd,
-        cwd=repo,
-        text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        timeout=timeout,
-    )
+    proc = capture_process(cmd, cwd=repo, timeout=timeout)
     ended_at = iso_now()
     wall_ms = int((time.monotonic() - start) * 1000)
     write_text(stdout_path, proc.stdout)
@@ -411,10 +438,14 @@ def run_claude(cmd: list[str], repo: Path, out_dir: Path, attempt: int, prompt: 
         data = json.loads(proc.stdout)
     except json.JSONDecodeError:
         data = {}
-    usage = data.get("usage") or {}
+    data = data if isinstance(data, dict) else {}
+    usage = data.get("usage") if isinstance(data.get("usage"), dict) else {}
+    returncode = proc.returncode
+    if returncode == 0 and (data.get("is_error") or data.get("type") != "result" or data.get("subtype") != "success" or not data.get("result")):
+        returncode = 1
     input_tokens = usage_value(usage, "input_tokens")
-    cache_create = int(usage.get("cache_creation_input_tokens") or 0)
-    cache_read = int(usage.get("cache_read_input_tokens") or 0)
+    cache_create = usage_value(usage, "cache_creation_input_tokens")
+    cache_read = usage_value(usage, "cache_read_input_tokens")
     output_tokens = usage_value(usage, "output_tokens")
     return AgentRun(
         env="claude",
@@ -422,15 +453,15 @@ def run_claude(cmd: list[str], repo: Path, out_dir: Path, attempt: int, prompt: 
         attempt=attempt,
         prompt=prompt,
         command=cmd,
-        returncode=proc.returncode,
+        returncode=returncode,
         started_at=started_at,
         ended_at=ended_at,
         wall_time_ms=wall_ms,
         ttft_ms=data.get("ttft_ms"),
         input_tokens=input_tokens,
-        cached_input_tokens=cache_create + cache_read,
+        cached_input_tokens=known_sum([cache_create, cache_read]),
         output_tokens=output_tokens,
-        reasoning_output_tokens=0,
+        reasoning_output_tokens=None,
         total_tokens=known_sum([input_tokens, cache_create, cache_read, output_tokens]),
         cost_usd=data.get("total_cost_usd"),
         session_id=data.get("session_id"),
@@ -468,8 +499,14 @@ def run_evaluator(repo: Path, scenario: dict[str, Any], mode: str, transcript: s
 
 
 def git_diff(repo: Path) -> str:
-    proc = subprocess.run(["git", "diff", "--", "."], cwd=repo, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    return proc.stdout
+    proc = subprocess.run(["git", "diff", "HEAD", "--", "."], cwd=repo, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    diff = proc.stdout
+    untracked = subprocess.run(["git", "ls-files", "--others", "--exclude-standard", "-z"], cwd=repo, stdout=subprocess.PIPE, check=True)
+    for name in untracked.stdout.decode().split("\0"):
+        if name:
+            added = subprocess.run(["git", "diff", "--no-index", "--", "/dev/null", name], cwd=repo, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            diff += added.stdout
+    return diff
 
 
 def run_one(
@@ -486,6 +523,19 @@ def run_one(
     logs = case_dir / "logs"
     logs.mkdir(parents=True, exist_ok=True)
     copy_fixture(scenario, repo)
+    original_tests = {path.relative_to(repo): path.read_bytes() for path in (repo / "tests").rglob("*") if path.is_file()}
+    integrity_failures = []
+
+    def check_integrity(stage):
+        for relative, original in original_tests.items():
+            path = repo / relative
+            try:
+                intact = not path.is_symlink() and path.is_file() and path.read_bytes() == original
+            except OSError:
+                intact = False
+            if not intact:
+                integrity_failures.append({"stage": stage, "path": str(relative)})
+
     memory_available = prepare_workspace_for_strategy(repo, strategy)
     skill_hashes = install_skill_snapshot(repo) if strategy == "dual" else {}
     case_start = time.monotonic()
@@ -500,6 +550,7 @@ def run_one(
     write_text(logs / "initial_test.stdout.log", initial_test["stdout"])
     write_text(logs / "initial_test.stderr.log", initial_test["stderr"])
 
+    check_integrity("initial_test")
     attempts: list[AgentRun] = []
     final_test = initial_test
     final_eval: dict[str, Any] = {"passed": False}
@@ -512,28 +563,36 @@ def run_one(
             prompt = build_prompt(scenario, method, strategy, session_index=idx)
             agent = adapter.run(repo, prompt, logs, idx + 1, args.agent_timeout, strategy)
             attempts.append(agent)
+            check_integrity(f"agent_{len(attempts)}")
             transcript += f"\n\n--- SESSION {idx + 1} ---\n{agent.final_text}\n"
             session_test = run_shell(scenario["test_command"], repo, timeout=args.test_timeout)
+            check_integrity(f"session_test_{idx + 1}")
             write_text(logs / f"session_{idx + 1}_test.stdout.log", session_test["stdout"])
             write_text(logs / f"session_{idx + 1}_test.stderr.log", session_test["stderr"])
         final_test = run_shell(scenario["test_command"], repo, timeout=args.test_timeout)
+        check_integrity("memory_final_test")
         final_eval = run_evaluator(repo, scenario, "memory", transcript, logs)
-        passed = all(a.returncode == 0 for a in attempts) and successful(agent, final_test, final_eval)
+        check_integrity("memory_final")
+        passed = not integrity_failures and all(a.returncode == 0 for a in attempts) and successful(agent, final_test, final_eval)
     else:
         repair_text = None
         for attempt in range(args.max_repair_loops + 1):
             prompt = build_prompt(scenario, method, strategy, repair=repair_text)
             agent = adapter.run(repo, prompt, logs, attempt + 1, args.agent_timeout, strategy)
             attempts.append(agent)
+            check_integrity(f"agent_{len(attempts)}")
             transcript += f"\n\n--- ATTEMPT {attempt + 1} ---\n{agent.final_text}\n"
             final_test = run_shell(scenario["test_command"], repo, timeout=args.test_timeout)
             write_text(logs / f"test_attempt_{attempt + 1}.stdout.log", final_test["stdout"])
             write_text(logs / f"test_attempt_{attempt + 1}.stderr.log", final_test["stderr"])
+            check_integrity(f"test_{attempt + 1}")
             final_eval = run_evaluator(repo, scenario, method, transcript, logs)
-            passed = successful(agent, final_test, final_eval)
+            check_integrity(f"evaluation_{attempt + 1}")
+            passed = not integrity_failures and successful(agent, final_test, final_eval)
             if passed:
                 break
             repair_text = (
+                f"Fixture test integrity failures: {json.dumps(integrity_failures)}\n"
                 f"Agent CLI return code: {agent.returncode}\n"
                 f"Test command: {scenario['test_command']}\n"
                 f"Return code: {final_test['returncode']}\n"
@@ -560,6 +619,7 @@ def run_one(
         "strategy": strategy,
         "memory_available": memory_available,
         "skill_snapshot_sha256": skill_hashes,
+        "fixture_test_integrity": {"passed": not integrity_failures, "failures": integrity_failures},
         "model_requested": args.codex_model if env == "codex" else args.claude_model,
         "reasoning_effort_requested": args.codex_reasoning_effort if env == "codex" else None,
         "usage_scope": "CLI-reported only; delegated usage inclusion is not independently verified",
@@ -693,10 +753,9 @@ def summarize(results: list[dict[str, Any]], run_root: Path) -> None:
     lines.append("## Benchmark Question")
     lines.append("")
     lines.append(
-        "The benchmark is not trying to prove that Dual-Brain is faster per attempt. "
-        "It is expected to spend more time and tokens. The question is whether that "
-        "up-front reasoning cost prevents the mistakes that make a human run the agent again: "
-        "repair prompts, hallucinated APIs, stale assumptions, and architecture regressions."
+        "Compare correctness, automated repairs, elapsed time, and reported usage separately. "
+        "Neither a quality nor a speed advantage is assumed. These scenarios do not measure "
+        "human effort or isolate all differences in instructions and orchestration."
     )
     lines.append("")
     write_text(run_root / "benchmark_results.md", "\n".join(lines))

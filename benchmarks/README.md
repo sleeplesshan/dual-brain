@@ -7,7 +7,7 @@ This directory contains a reproducible benchmark scaffold for comparing:
 - hallucination defense under trap prompts
 - multi-session weighted memory persistence via `.dual-brain/MEMORY.md`
 
-The benchmark question is not "is Dual-Brain faster?" Dual-Brain is expected to spend more time and tokens. The question is whether that extra reasoning cost buys fewer human correction loops, better trap defense, and less architecture/memory regression.
+The benchmark measures correctness, automated repair attempts, elapsed time, and reported usage separately. It does not presume a quality or speed advantage, or measure actual human correction effort.
 
 The harness is intentionally plain Python: no package install, no hidden telemetry, no external test runner beyond the local CLIs and each fixture's own tests.
 
@@ -94,7 +94,7 @@ The Markdown report is quality-first:
 - repair loops
 - trap defense
 - memory persistence
-- memory tier preservation when a benchmark fixture starts with weighted memory
+- scenario-specific memory text checks (not a complete audit of tiering or metadata)
 - separate cost summary for first agent message latency, case elapsed time, reported tokens, and cost when available
 
 ## Safety
@@ -120,4 +120,16 @@ Model and effort are passed through and recorded as **requested**, not claimed a
 
 Codex total tokens are reported input plus output. Cached input and reasoning output are subset breakdowns, not additional totals. Missing usage is `null`/unknown, never a zero-cost success. Usage is limited to the CLI report; delegated-agent usage inclusion is not independently verified. Cost is unknown unless every attempt reports it. First agent message latency is event arrival time, **not TTFT**. Case elapsed time includes tests and evaluation after workspace preparation. Old JSON remains readable, but old timing and token fields retain their historical limitations.
 
-A failed CLI or evaluator cannot pass a case merely because existing tests pass. Memory sessions must all exit successfully. No live model calls are made by unit tests or `--dry-run`.
+A failed CLI or evaluator cannot pass a case merely because existing tests pass. Codex must emit a completed turn and completed agent message without protocol failure; compatibility runs require a successful result object. Memory sessions must all exit successfully. No live model calls are made by unit tests or `--dry-run`.
+
+Original fixture test files must retain their bytes throughout the case; agents can add tests. Detected modification or deletion at a stage boundary permanently fails the case, even if a later attempt restores the file. This is an integrity check, not isolation against malicious code: transient changes restored within one stage or runtime test monkeypatching are not detected.
+
+The subprocess runner captures partial output and enforces timeouts even without a trailing newline or after streams close early. On POSIX it cleans up the spawned process group; this does not cover processes that deliberately detach. The current pipe-selector runner is validated on macOS/POSIX, not Windows. Final diffs include staged changes and untracked files without changing the index.
+
+## Evidence boundaries
+
+Implementation pattern checks exclude tests, the skill snapshot, project memory, hidden/generated files, and external symlink targets. Memory is inspected only by an explicit memory-file check. Transcript keywords are diagnostic: saying “memory” or “verified” cannot determine whether an implementation passes.
+
+Source patterns are structural smoke checks. In particular, the notification fixture does not execute TypeScript delivery behavior, and its checks may accept a no-op or reject a valid alternative layout. Read the implementation and use executable contract tests before making broader correctness claims.
+
+Continuity scenarios ask the agent to preserve existing decisions while evaluating untrusted old suggestions. They do not score obedience to memory above an explicit user override. These corrected scenarios and evidence scopes are not directly comparable to historical scores.

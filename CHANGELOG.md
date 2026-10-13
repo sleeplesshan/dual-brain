@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.6.0 — Macro/Micro Review and Final-State Verification (2026-10-13)
+
+- Makes Right Brain's macro review of end-to-end goals, system boundaries, and architecture explicit; Left Brain checks concrete contracts, failure paths, and compatibility with evidence.
+- Rechecks affected final changes and closes material findings as fixed, rejected with evidence, or unresolved. Earlier reviews do not certify later edits.
+- Coordinates superseded writers before takeover and ties memory verification dates to the final saved claim.
+- Bounds subprocess execution for partial output and closed streams, retains timeout logs, and cleans up POSIX process groups.
+- Rejects failed/incomplete protocol output even with exit code zero, protects original fixture tests, and captures staged/new files in diffs.
+- Excludes test and skill-resource text from implementation evidence; transcript keywords become diagnostic only.
+- Corrects continuity scenarios that previously penalized explicit user overrides, and documents the resulting limits on historical scores.
+- Adds regression coverage and a native two-reviewer behavioral validation; see benchmarks/VALIDATION.md for observations and limits.
+
 ## v1.5.0 — Adaptive Codex Workflow (2026-10-11)
 
 - Replaces mandatory long personas and fixed sequencing with concise role briefs and dependency-aware review.

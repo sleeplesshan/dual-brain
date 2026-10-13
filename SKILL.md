@@ -1,11 +1,11 @@
 ---
 name: dual-brain
-description: Dual-brain review for ambiguous designs, risky refactors, and recurring project decisions. Use complementary framing and evidence checks with project memory when a task benefits from both perspectives.
+description: Dual-brain review for ambiguous designs, risky refactors, and recurring project decisions. Combine macro-level design review with micro-level code verification and relevant project memory.
 ---
 
 # Dual-Brain
 
-Use two complementary perspectives to improve a concrete result: **Right Brain** challenges the framing; **Left Brain** verifies the evidence. These are review roles, not claims about human neuroscience. The orchestrator owns delivery, integration, and memory writes.
+Use two complementary perspectives to improve a concrete result: **Right Brain** examines the whole problem and design; **Left Brain** checks concrete implementation details. These are review roles, not claims about human neuroscience. The orchestrator owns delivery, integration, and memory writes.
 
 ## Choose the smallest useful workflow
 
@@ -27,19 +27,21 @@ Reuse a usable, role-compatible agent in this conversation when its context is s
 
 **Right Brain brief:**
 
-> Review the task's framing and relevant memory. Identify consequential assumptions, unclear terms, constraints at risk, and one useful alternative if warranted. Return a recommended direction, unresolved decisions, and specific claims for verification. Do not edit files or create agents. Keep findings concise; omit ceremonial questions that the supplied evidence already answers.
+> Take the macro view: does the proposed approach solve the user's end-to-end problem? Review assumptions, system boundaries, cross-component effects, architectural fit, and relevant memory. Identify constraints at risk and one useful alternative if warranted. Return a recommended direction, unresolved decisions, and specific claims for verification. Do not edit files or create agents. Omit ceremonial questions that the evidence already answers.
 
 **Left Brain brief:**
 
-> Verify the task against actual code, tests, and relevant primary documentation. Independently inspect consequential claims; distinguish confirmed, contradicted, and unverified memory. Return evidence locations, concrete failures or risks, a bounded implementation/check plan, and any proposed memory correction. Do not create agents. Do not edit files unless the orchestrator explicitly assigns isolated implementation ownership.
+> Take the micro view: verify concrete contracts, data/control flow, edge cases, failure paths, and compatibility against actual code, tests, and relevant primary documentation. Independently inspect consequential claims; distinguish confirmed, contradicted, and unverified memory. For bug findings, give the trigger, consequence, and evidence; label untested hypotheses. Return the state checked, a bounded check plan, and any proposed memory correction. Do not create agents. Do not edit files unless the orchestrator explicitly assigns isolated implementation ownership.
 
 Independent framing and evidence gathering may run in parallel. If Left's work depends on a design decision, finish Right first. Before synthesis, give Left any consequential Right findings it has not checked and obtain the necessary follow-up. Do not restart verification for findings already covered by evidence. The orchestrator can do independent work while agents run, but should not finalize dependent decisions before their results arrive.
 
-Send summaries with file paths, check results, and unresolved issues rather than entire transcripts. Limit disagreement to one targeted follow-up per material conflict; then choose using evidence or report the unresolved limitation. Prefer evidence over role authority or agreement. If an agent fails or reaches a limit, reuse its useful findings and complete the missing pass locally, disclosing the reduced review coverage.
+Send summaries with file paths, check results, and unresolved issues rather than entire transcripts. The roles focus attention; either reviewer can challenge any consequential claim. Limit disagreement to one targeted follow-up per material conflict; then choose using evidence or report the unresolved limitation. Prefer evidence over role authority or agreement. If an agent fails or reaches a limit, reuse its useful findings and complete the missing pass locally, disclosing the reduced review coverage. Stop or coordinate any still-running writer before taking over its files.
 
 ## Deliver and retain useful context
 
 Carry authorized work through implementation, appropriate verification, and the requested delivery. Assign disjoint write ownership if delegating implementation; the orchestrator integrates and reviews the final state. Avoid concurrent writes to the same files. A blueprint alone does not complete a request to make changes.
+
+After consequential edits, verify the affected final diff and acceptance criteria. Resolve material findings as fixed, rejected with evidence, or unresolved. Reuse the relevant reviewer when an independent check adds value, or verify locally and describe the coverage accurately. Pre-edit findings and earlier passing tests do not certify changed code; rerun only checks invalidated by the changes. Preserve unaffected evidence and do not weaken acceptance tests merely to obtain a pass.
 
 For writable implementation tasks, save durable, non-sensitive decisions when they changed; update metadata only for influential memory. Read [the memory contract](references/memory.md) before writing, migrating, or compacting memory. The orchestrator is the sole memory writer. For read-only reviews or user requests forbidding memory changes, propose any correction without writing. No durable change means no forced memory file.
 

@@ -14,6 +14,8 @@ Read this when adapting delegation or settings to a host. Inspect the tools expo
 
 Agent handles belong only to the live session. After compaction, use available session state to recover valid handles; if unavailable, rebuild a concise brief from files and evidence. Never save runtime IDs in project memory. Replace a reused agent if irrelevant or stale context would outweigh reuse savings.
 
+When user steering changes the goal or implementation, send affected agents the updated brief and identify which earlier findings need rechecking. Interrupt superseded work when supported. Confirm an old writer has stopped, or agree on non-overlapping ownership, before a replacement edits its files. If stopping it cannot be confirmed, continue independent work without competing writes. Match returned findings to the brief and file state they actually checked.
+
 ## Models and context
 
 Inherit the active model and reasoning effort unless the user or applicable configuration requests a different choice. Read live support before any override; a model available to the parent or in public docs may not be available to a particular spawn tool. Do not silently switch the parent, change global configuration, or install an upgrade.

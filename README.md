@@ -1,6 +1,6 @@
 # Dual-Brain
 
-A portable skill for complementary review and durable project memory. One perspective challenges the framing; another checks the evidence. The main agent turns both into a finished result.
+A portable skill for complementary review and durable project memory. The Right Brain takes the macro view of the problem, architecture, and cross-component effects; the Left Brain takes the micro view of contracts, edge cases, and actual code. The main agent turns both into a finished result.
 
 Dual-Brain is useful for ambiguous designs, risky refactors, unfamiliar integrations, and recurring project decisions. Simple edits use a short local review instead of paying for unnecessary agents. It does not guarantee better results or lower latency on every task.
 
@@ -36,11 +36,13 @@ Normal automatic discovery remains enabled. The narrower description targets tas
 
 1. Load only relevant project memory and define the deliverable and checks.
 2. Reuse suitable live brain agents, or create the missing roles within runtime limits.
-3. Right examines assumptions and alternatives; Left gathers evidence. Independent work can overlap, while dependent design checks remain ordered.
-4. Reconcile consequential findings and finish the implementation and verification.
+3. Right examines end-to-end behavior, system boundaries, and alternatives; Left checks concrete implementation contracts, failure paths, and compatibility. Independent work can overlap, while dependent design checks remain ordered.
+4. Reconcile consequential findings, implement, and verify the affected final state. Earlier reviews do not certify later edits; close findings with evidence and rerun checks that the changes invalidate.
 5. Save changed durable decisions when writes are in scope, and report the outcome.
 
 Reviewers return bounded findings and evidence paths. Only the orchestrator integrates edits and writes memory. There are no nested brain trees, mandatory transcripts, or automatic extra approval loops. If subagents are unavailable, the agent reports a local two-pass fallback instead of pretending independent review happened.
+
+When the user changes direction, update affected reviewers and stop superseded writers before taking over their files. Save memory verification dates only when evidence supports the final claim.
 
 The exact contract lives in [SKILL.md](SKILL.md). Tool adaptation and model selection are in [references/runtime.md](references/runtime.md).
 

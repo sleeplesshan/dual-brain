@@ -4,6 +4,8 @@ This is an early evidence snapshot from one 5-case Codex run before v1.3.0 memor
 
 **Historical limitations:** This run predates the equal-memory control and explicit repository skill snapshots, so memory access and orchestration are confounded and exact skill loading was not verified. Retries were automated, not human interventions. It does not establish performance on current Codex models. No new live benchmark results are claimed here.
 
+The v1.6.0 review also found that some original continuity prompts explicitly requested architecture reversals and then penalized compliance. Source checks could include tests or skill resources, and original test integrity was not enforced. The numbers below are preserved as historical recorded scores, not reliable estimates of correctness or memory quality. Re-run corrected scenarios for new comparisons.
+
 Run source: `benchmarks/runs/20260529T013920Z`
 
 ## Historical Automated Retry Outcomes
@@ -46,7 +48,7 @@ Both strategies avoided the forbidden APIs in the final state. Dual-Brain improv
 | notifications | failed | passed |
 | access_control | failed | failed |
 
-The `access_control/memory` miss is important. Dual-Brain remembered the central policy registry decision, but still allowed an inline owner role check in Session 3. The benchmark correctly caught that as an architecture regression.
+The old `access_control/memory` evaluator classified an inline owner role check as a regression. However, Session 3 explicitly requested inline checks, so that result cannot establish a failure to remember or follow instructions. The corrected continuity prompt preserves the architecture and treats the shortcut as an unverified old suggestion.
 
 ## Cost Summary
 
