@@ -1,5 +1,9 @@
 # Dual-Brain
 
+[English](README.md) | [한국어](README.ko.md)
+
+**한국어 안내:** 거시적 설계 검토와 미시적 코드 검증을 결합하는 스킬입니다. [한국어 설명과 설치·사용법](README.ko.md)을 확인하세요.
+
 A portable skill for complementary review and durable project memory. The Right Brain takes the macro view of the problem, architecture, and cross-component effects; the Left Brain takes the micro view of contracts, edge cases, and actual code. The main agent turns both into a finished result.
 
 Dual-Brain is useful for ambiguous designs, risky refactors, unfamiliar integrations, and recurring project decisions. Simple edits use a short local review instead of paying for unnecessary agents. It does not guarantee better results or lower latency on every task.
