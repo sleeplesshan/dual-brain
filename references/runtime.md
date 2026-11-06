@@ -22,15 +22,14 @@ Inherit the active model and reasoning effort unless the user or applicable conf
 
 For Codex tools exposing `fork_turns`, follow their schema: full-history forks may disallow model/effort overrides. A fresh-context fork needs a self-contained task brief and evidence paths. Use one when it removes substantial irrelevant history; inherit context when it contains essential constraints that are costly to reconstruct.
 
-If the user asks for model selection, these are **dated starting points, not measured Dual-Brain rankings** (reviewed 2026-10-11):
+Keep model selection separate from this protocol. Use the model selected in the host, and override it only when requested and supported. Do not transplant Codex model IDs, effort values, configuration files, or agent tool names into Claude Code, Grok, Grok Bot, Muse, or another host. Public model availability does not prove access in the active session.
 
-| Available model | Suggested use |
-|---|---|
-| `gpt-6.1-sol` | General demanding coding and repeated agent workflows; start with the client's default effort. |
-| `gpt-6-astra` | Especially difficult synthesis and judgment; preserve autonomy and concrete completion criteria rather than adding ceremony. |
-| `gpt-6-luna` | Narrow, explicit checks and repeatable transformations; supply clear inputs and acceptance criteria. |
-| `gpt-6-sol`, GPT-5.6 variants | Retain when selected and supported; the same capability-based protocol applies. |
+## Capability modes
 
-Increase effort only for unresolved complexity that could change the outcome. Maximum effort and more agents are not automatic performance improvements. Check support for each effort; do not assume Ultra exists on every model. These suggestions do not authorize an override by themselves.
+- **Native delegation + files:** use actual reviewer tools and the authorized project filesystem; isolate writers.
+- **Files but no delegation:** perform macro and micro passes locally, and describe that coverage accurately.
+- **Conversation only:** inspect supplied code/text. Produce a patch or explanation if warranted, never fictitious file writes, tool results, or independent reviewers. An attachment must actually be readable before claiming to have reviewed it.
 
-Official sources: [models](https://learn.chatgpt.com/docs/models), [subagents](https://learn.chatgpt.com/docs/agent-configuration/subagents), and [skill/prompt design](https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra). Recheck current guidance when making model recommendations. Desktop, CLI, API, and other hosts can have different capabilities.
+Check capabilities once per session or when they change. Do not turn platform detection into a repeated setup ritual. A provider's API tool support is not evidence that its chat UI exposes the same tools. Never create accounts, install CLIs, alter global instruction files, or call a paid API just to simulate missing capabilities.
+
+Increase reasoning effort only for unresolved complexity that could change the outcome. Maximum effort and more agents are not automatic improvements. A completed review with no supported changes needs no escalation to another model.

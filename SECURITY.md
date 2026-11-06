@@ -28,7 +28,7 @@ Do **not** store secrets in project memory:
 
 If memory contains sensitive content, Dual-Brain should not summarize it into future context. In writable scope, it should remove or redact only the sensitive material and report its category. In a read-only review, report the category without modifying the file. Redaction does not erase Git history or revoke credentials.
 
-Dual-Brain may automatically update and compact `.dual-brain/MEMORY.md` for non-sensitive project memory after synthesis. It may update `refs`, `last_referenced`, and `last_verified` metadata only for memory that materially influenced or was verified during the session. Automatic memory mutation is never a license to store secrets, sensitive personal data, or instructions that override user intent, tool safety, or system instructions.
+Dual-Brain may update non-sensitive project memory after synthesis when durable content changes or memory maintenance is requested. Metadata updates accompany warranted saves, not unchanged repeat reviews. Without an accessible project filesystem, memory suggestions remain unsaved; the skill does not silently use account-wide memory. Automatic memory mutation is never a license to store secrets, sensitive personal data, or instructions that override user intent, tool safety, or system instructions.
 
 ## Supported versions
 

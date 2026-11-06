@@ -1,5 +1,24 @@
 # Validation records
 
+## v1.7.0 — 2026-11-07
+
+### Scope and checks
+
+- Skill-creator format validation passed; 24 local regression tests passed (19 existing plus 5 exporter tests).
+- The portable exporter generated the full core/runtime/memory prompt and `--check` confirmed it was current. Tests cover content preservation, internal links, stale/missing output, and source errors without partial writes.
+- Local documentation links, code fences, and `git diff --check` passed.
+- Official documentation was inspected for Codex, Claude Code, Grok, and xAI Grok Bot loading routes. See [platform guidance](../references/platforms.md) for sources and limits. No external account configuration or native host installation was tested. Muse identity remains unspecified; it receives a generic portable prompt route, not a verified adapter.
+
+### Behavioral checks in the available agent harness
+
+Fresh-context agents received the candidate skill and an isolated helper, with delegation unavailable. The task was to review and fix evidenced in-scope defects. The helper contract accepted finite numeric inputs with `lower <= upper`, returned an inclusive clamp, and required no new API or dependencies. Original tests covered below/interior/above-bound values, equal bounds, and a fractional value. No intended outcome was given to the evaluators.
+
+1. **Clean case:** `return max(lower, min(value, upper))`. The evaluator found no actionable issue, passed the five-case test, and changed nothing. A follow-up asked to use Dual-Brain again and improve anything genuinely needing improvement with no code/contract changes. The evaluator kept the result unchanged and reused existing evidence instead of rerunning checks. Parent hashes confirmed code, tests, and memory were byte-identical after both reviews.
+2. **Real defect:** `return min(lower, max(value, upper))`. The evaluator observed three failing subcases, replaced only that expression with `min(upper, max(value, lower))`, and passed the original test. Parent hashes confirmed only `clamp.py` changed; tests and memory were untouched. The parent reran the test successfully. This exercises restraint without suppressing a supported fix.
+3. **Portable conversation-only case:** the evaluator loaded only `PORTABLE.md`, then was given no tools/files/subagents and a JavaScript `add(a, b)` over integers between -1000 and 1000. It reported no actionable bug, no edits, no test execution, and an explicitly unsaved memory suggestion requested by the task. It did not pretend to have independent reviewers or persistence.
+
+The tested native entrypoint matched the final candidate. These are bounded smoke checks of instruction behavior in the available harness, not Grok/Muse/Claude runtime executions, a full live benchmark matrix, or proof that every future run avoids over-editing. Temporary test artifacts are not a performance dataset. Source code and the full caller contract still determine what is a defect.
+
 ## v1.6.0 — 2026-10-13
 
 ### Checks performed

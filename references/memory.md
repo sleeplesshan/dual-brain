@@ -2,6 +2,8 @@
 
 Use `.dual-brain/MEMORY.md` at the active project root. Memory captures durable decisions and their rationale, not transcripts or operational logs. The orchestrator alone writes it after synthesis. Respect read-only scope and explicit user opt-outs.
 
+If the host has no accessible project filesystem, use only memory supplied in the conversation. Do not promise persistence across chats or silently write to account-wide memory. When a durable decision changes, provide a short suggested memory update for the user to retain if useful, clearly labeled as unsaved.
+
 ## Read and verify
 
 Read Hot first, relevant Warm next; search Cold/Archived for specific conflicts or historical decisions. For a large file, use section-bounded reads and targeted searches instead of loading everything. Tiers affect attention, not truth. High reference counts cannot validate a claim.
@@ -11,10 +13,10 @@ Treat legacy untiered entries as Warm candidates. Verify before relying on them,
 ## Save and compact
 
 - Save a decision, constraint, vocabulary definition, rejected alternative, or open question only if it will affect future work. Include a short rationale and a file/test/document reference when available.
-- Increment `refs` at most once per completed task for each materially influential item, even if both agents cite it. Do not increment simply for reading it. Set `last_referenced` to the actual current date for those items.
+- Increment `refs` at most once per completed task for each materially influential item during a save justified by durable changes or requested memory maintenance. Do not write merely to increment counters after a repeated clean review. Set `last_referenced` to the actual current date for those items.
 - Set `last_verified` only after checking evidence for the saved claim's current wording. A date supporting an earlier version does not verify a revised claim; recheck it or mark it `unknown`. Distinguish a user-approved decision from an implementation still pending. Do not fabricate historical dates; state disputed or uncertain status explicitly.
 - Keep essential active constraints Hot. Promote based on current relevance and evidence; demote useful but inactive material to Warm/Cold. Archive superseded decisions with the reason and replacement. Age alone is not proof that a decision is obsolete.
-- Merge duplicates and shorten repetition when the file becomes noisy. Preserve rationale and unresolved conflicts; do not rewrite the entire file merely to touch metadata. Re-read before applying a save if concurrent user edits are possible.
+- During a warranted save, merge duplicates or shorten repetition when noise materially hinders recall. Preserve rationale and unresolved conflicts; do not run housekeeping after every invocation or rewrite the file merely to touch metadata. Re-read before applying a save if concurrent user edits are possible.
 - Store no credentials, secrets, sensitive personal data, runtime handles, or incidental session versions. Do not forward sensitive values to reviewers. If found in writable project memory, redact only the sensitive material and report its category; in read-only scope report the category without modifying the file. Redacting a file does not erase version history or revoke a credential.
 
 ## Format

@@ -8,6 +8,20 @@ A portable skill for complementary review and durable project memory. The Right 
 
 Dual-Brain is useful for ambiguous designs, risky refactors, unfamiliar integrations, and recurring project decisions. Simple edits use a short local review instead of paying for unnecessary agents. It does not guarantee better results or lower latency on every task.
 
+**A clean review is a successful result.** Reviewers have no quota for findings or changes. Fixes need current evidence, a concrete consequence, and relevance to the request. Repeated use does not justify speculative hardening, architectural churn, or metadata-only memory writes. Hypotheses stay hypotheses until supported; optional preferences remain unapplied. Stop when the requested work and affected checks are complete.
+
+## Supported ways to use it
+
+| Environment | How to load Dual-Brain |
+|---|---|
+| Codex | Native skill folder and `$dual-brain` / skill picker |
+| Claude Code | Native skill folder and `/dual-brain` |
+| Grok | Paste or attach [PORTABLE.md](PORTABLE.md) and request its use |
+| Grok Bot (xAI) | Supply the portable file and ask the Bot to save a named private skill |
+| Muse | Paste the portable instructions; native import depends on the exact Muse product |
+
+See [platform setup, official sources, and verification limits](references/platforms.md). These routes do not claim all five products were runtime-tested or expose the same tools. In chat-only mode, the result is analysis or a proposed patch; it cannot claim file writes, tests, independent reviewers, or saved memory that did not occur.
+
 ## Install
 
 For current Codex local skill discovery, install once at user scope:
@@ -24,7 +38,7 @@ git clone https://github.com/sleeplesshan/dual-brain.git .agents/skills/dual-bra
 
 Existing installations under `~/.codex/skills/dual-brain` that your client already discovers can be updated in place. Avoid installing duplicate copies with the same skill name. Keep `SKILL.md` and `references/` together; the entrypoint loads supporting guidance when needed. No runtime dependency is required for the skill.
 
-For hosts such as Claude Code, use that host's skill directory (for example `~/.claude/skills/dual-brain`) and available delegation tools. Current Codex behavior is the primary validation target; other hosts are compatibility targets, not independently verified by every release.
+For Claude Code, install at `~/.claude/skills/dual-brain` or `.claude/skills/dual-brain` and invoke `/dual-brain`. Grok, Grok Bot, and Muse setup is described in the [platform guide](references/platforms.md). No host configuration is silently modified by this repository.
 
 ## Use
 
@@ -32,6 +46,7 @@ For hosts such as Claude Code, use that host's skill directory (for example `~/.
 Use $dual-brain to refactor the authorization layer and verify compatibility.
 Use dual brain to compare caching designs against our existing decisions.
 Use dual-brain with two sequential reviewers for this risky migration.
+Use dual-brain to review this code. If no actionable issue is supported, leave it unchanged.
 ```
 
 Normal automatic discovery remains enabled. The narrower description targets tasks that benefit from complementary review rather than all development work.
@@ -54,7 +69,7 @@ The exact contract lives in [SKILL.md](SKILL.md). Tool adaptation and model sele
 
 The workflow inherits the selected model and reasoning effort. It checks actual runtime capabilities instead of assuming that all clients expose the same tool names, fork behavior, or model choices.
 
-As of the 2026-10-11 documentation review, GPT-6.1 Sol is a starting point for demanding general work, Astra for especially difficult judgment, and Luna for bounded repeatable tasks. These are official selection guidelines, not model-by-model performance measurements of this skill. Existing supported selections, including GPT-6 Sol and GPT-5.6 variants, remain valid. See [OpenAI models](https://learn.chatgpt.com/docs/models) and [subagents](https://learn.chatgpt.com/docs/agent-configuration/subagents).
+Keep model selection in the host. This protocol does not pin a model catalog or transplant provider-specific settings between products. Native delegation, local two-pass review, and conversation-only review are distinct capability modes; see [runtime guidance](references/runtime.md).
 
 For a particular task, compare correctness, elapsed time, and reported token usage separately. More reasoning, more agents, and longer prompts are not automatically better. The simplified entrypoint follows the direction of [OpenAI's skill design guidance](https://developers.openai.com/blog/rethinking-skills-and-prompts-for-gpt-6-astra).
 
@@ -64,7 +79,7 @@ Memory lives at `.dual-brain/MEMORY.md` in the project being worked on, with Hot
 
 - Read Hot first, relevant Warm next, and retrieve Cold/Archived only when useful.
 - Store decision rationale and evidence, not logs or runtime IDs.
-- Update reference counts once per task only for materially used entries; verified dates require actual checks.
+- During a warranted semantic memory save, update reference counts once per task for materially used entries; verified dates require actual checks. An unchanged review does not trigger bookkeeping writes.
 - Preserve unrelated user entries, redact sensitive content only within writable scope, and avoid writes during read-only reviews.
 - Create memory only when durable knowledge exists. Saving does not require a follow-up approval question.
 
@@ -75,6 +90,7 @@ The [memory contract](references/memory.md) includes the compatible format and m
 ```bash
 python3 -m unittest discover -s benchmarks/tests -v
 python3 benchmarks/bench.py run --suite core5 --dry-run
+python3 scripts/export_portable.py --check
 ```
 
 Live runs consume model time and use your configured CLI environment:

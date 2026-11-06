@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.7.0 — Portable Review Without Forced Changes (2026-11-07)
+
+- Adds an evidence-before-changes contract: clean reviews are successful, no finding quota, no speculative refactors, bounded investigation, and explicit stopping conditions.
+- Separates defects from hypotheses/preferences and preserves requested redesign or optimization work within its acceptance criteria.
+- Prevents reference-count-only writes and automatic housekeeping after unchanged repeated reviews.
+- Adds documented setup routes for Codex, Claude Code, Grok, xAI Grok Bot, and generic Muse prompt use, with unverified native capabilities clearly distinguished.
+- Adds a generated self-contained `PORTABLE.md` and stdlib exporter with a freshness check; native skills keep conditional reference loading.
+- Makes missing tools/files/persistence explicit and removes the dated provider-specific model catalog from shared runtime guidance.
+- Updates English and Korean documentation. Validation distinguishes portable behavior in the available harness from untested external product integrations.
+
 ## v1.6.0 — Macro/Micro Review and Final-State Verification (2026-10-13)
 
 - Makes Right Brain's macro review of end-to-end goals, system boundaries, and architecture explicit; Left Brain checks concrete contracts, failure paths, and compatibility with evidence.
