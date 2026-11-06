@@ -7,8 +7,8 @@ Documentation checked 2026-11-07. Use the same `SKILL.md` and references across 
 | Codex | Native skill directory | Actual subagent tools when exposed; local passes otherwise |
 | Claude Code | Native skill directory | Supported subagents with an explicit brief; local passes otherwise |
 | Grok web/apps | Paste or attach `PORTABLE.md` and explicitly request its use | Review supplied material with available tools; no assumed native skill discovery |
-| Grok Bot (xAI) | Supply `PORTABLE.md` and ask the Bot to save it as a named private skill | Use the Bot's actual capabilities; confirm saving/enabling before claiming installation |
-| Muse (Meta) | Paste `PORTABLE.md` into a Muse conversation with the task | Use available tools or local review passes; native skill import is not verified |
+| Grok Bot (xAI) | Send the [installer instruction](../prompts/install-grok-bot.md) to the main Bot | Bot retrieves the prompt, saves/updates a private skill, and verifies availability |
+| Muse (Meta) | Send the [installer instruction](../prompts/install-muse.md) to Muse | Muse checks supported persistence and verifies it, or reports session-only use |
 
 “Grokbot” here means xAI Grok Bot, and “Muse” means Meta's Muse personal agent. Muse Code is a separate coding product; its features do not establish an installation path for the personal agent.
 
@@ -52,29 +52,32 @@ The documented upload support includes Markdown/text. Attaching instructions doe
 
 ## Grok Bot
 
-For **xAI Grok Bot**, provide the portable document and ask:
+Send this message to your main **xAI Grok Bot**. The linked instruction asks the Bot to retrieve the full prompt, save or update its private skill, and verify availability:
 
 ```text
-Save these instructions as a private skill named dual-brain. Preserve the
-capability checks, evidence-before-changes rules, and no-change stopping condition.
+Read and follow these instructions to install or update dual-brain for this Bot:
+https://raw.githubusercontent.com/sleeplesshan/dual-brain/main/prompts/install-grok-bot.md
+Complete setup and verify the saved skill. Tell me any remaining step.
 ```
 
-Inspect the saved instructions and enable the private skill for the current Bot if required. Then request “Use dual-brain to [task].” Confirm the save through the Bot's response or UI; this repository cannot perform or verify that account operation for you. The Bot's documented private-skill flow does not establish a filesystem installation path. In particular, **Grok Build** is a different CLI; do not apply its directories to the Bot. [Official skills and routines](https://docs.x.ai/grok-bot/skills-routines-and-automations).
+Then request “Use dual-brain to [task].” Grok Bot documents saving named private skills and enabling them per Bot. If the Bot cannot enable it itself, use Connect apps → connected count → Private skills. The installation request does not create a routine or publish a team skill. **Grok Build** is a different CLI; its directories are not the Bot's installation contract. [Official skills and routines](https://docs.x.ai/grok-bot/skills-routines-and-automations).
 
 ## Meta Muse
 
-Meta describes Muse as a personal agent that accepts tasks through conversation in its app or WhatsApp. Our portable route uses that conversational interface; it is not a verified native skill integration. [Official Muse introduction](https://about.fb.com/news/2026/09/introducing-muse-personal-ai-agent/).
+Meta describes Muse as a personal agent that accepts tasks through conversation in its app or WhatsApp. Give Muse the setup task directly. A native skill import format is not verified, so the installer checks the current product's supported persistence instead of assuming a directory or API. [Official Muse introduction](https://about.fb.com/news/2026/09/introducing-muse-personal-ai-agent/).
 
-Paste the complete contents of [PORTABLE.md](../PORTABLE.md) into a Muse conversation, then add:
+Send this message to Muse:
 
 ```text
-Apply these Dual-Brain instructions to this task: [task and acceptance criteria].
-Review both the overall approach and concrete details. Make changes only when
-authorized and supported by evidence. If no actionable issue remains, stop.
-Report which checks actually ran; do not claim unavailable tools or saved memory.
+Read and follow these instructions to install or update dual-brain for me:
+https://raw.githubusercontent.com/sleeplesshan/dual-brain/main/prompts/install-muse.md
+Use your supported reusable-instruction mechanism and verify saving/loading.
+If persistence is unavailable, apply it in this conversation and say so.
 ```
 
-Check that the client accepted the whole document. If it offers attachments or reusable instructions, check that feature's supported format before using it. A conversation does not establish installation or persistent memory. Do not invent `.muse/skills`, a tool API, or a memory path. Use only capabilities available in the current session. Meta also documents [Muse Code](https://research.meta.ai/blog/introducing-muse-code-and-muse-spark-1-2); this guide does not transfer that product's native features to Muse.
+The installer distinguishes a reusable skill, a saved document that needs loading, and session-only instructions. It asks Muse to report the actual outcome and invocation. Saving a file does not by itself prove future loading. Meta's separate [Muse Code](https://research.meta.ai/blog/introducing-muse-code-and-muse-spark-1-2) product does not establish Muse's installation path.
+
+If either Bot cannot open the installer link, paste the linked installer's text. If it cannot retrieve the skill source, also attach or paste the complete [PORTABLE.md](../PORTABLE.md). No shell command is required from the user for these bot-driven routes.
 
 ## Portable file and updates
 
@@ -87,4 +90,4 @@ python3 scripts/export_portable.py --check
 
 Edit the source documents, not the generated file. Native installations keep progressive loading; chat-only hosts get the complete prompt so local references are not silently missing. Check the host's input limit; do not silently truncate the rules.
 
-For a Git installation, run `git pull --ff-only` inside that existing checkout. For a saved/pasted prompt, replace it with the current portable file explicitly; updating this repository does not update another product's account automatically.
+For a Git installation, run `git pull --ff-only` inside that existing checkout. For Grok Bot or Muse, send the same installer request again to update the existing copy. Other saved/pasted prompts need explicit replacement with the current portable file; updating this repository does not update another product's account automatically.

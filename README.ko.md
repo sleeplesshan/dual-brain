@@ -33,10 +33,10 @@
 | Codex | 스킬 폴더 설치 후 `$dual-brain` 또는 스킬 선택 |
 | Claude Code | 스킬 폴더 설치 후 `/dual-brain` |
 | Grok | [PORTABLE.md](PORTABLE.md)를 붙여 넣거나 첨부한 뒤 사용 요청 |
-| Grok Bot · xAI | 공통 문서를 전달하고 `dual-brain` 이름의 개인 스킬로 저장 요청 |
-| Muse · Meta | Muse 대화에 공통 문서와 작업 요청을 붙여 넣기. 네이티브 스킬 설치는 미검증 |
+| Grok Bot · xAI | 메인 봇에게 [설치 지침](prompts/install-grok-bot.md)을 보내 가져오기·개인 스킬 저장·활성화 확인 요청 |
+| Muse · Meta | Muse에게 [설치 지침](prompts/install-muse.md)을 보내 지원하는 방식으로 저장·불러오기 확인 요청 |
 
-[환경별 안내와 공식 근거](references/platforms.md)에 설치·업데이트 방법과 검증 범위를 정리했습니다. Grokbot은 xAI의 Grok Bot, Muse는 Meta의 개인 에이전트를 뜻합니다. 다섯 제품을 모두 직접 실행 검증했다는 뜻은 아닙니다. Meta Muse에는 대화 지침 방식으로 적용하며, 별도 제품인 Muse Code의 설치 경로나 기능을 가정하지 않습니다. 파일·실행 도구가 없는 대화 환경에서는 분석이나 수정안을 제공하고, 실제 수정·테스트·메모리 저장을 한 것처럼 말하지 않습니다.
+[환경별 안내와 공식 근거](references/platforms.md)에 설치·업데이트 방법과 검증 범위를 정리했습니다. Grokbot은 xAI의 Grok Bot, Muse는 Meta의 개인 에이전트를 뜻합니다. 다섯 제품을 모두 직접 실행 검증했다는 뜻은 아닙니다. Meta Muse의 네이티브 스킬 설치 규격은 미검증이므로, Muse가 현재 지원하는 저장 방식을 확인해 적용하도록 요청합니다. 파일·실행 도구가 없는 대화 환경에서는 분석이나 수정안을 제공하고, 실제 수정·테스트·메모리 저장을 한 것처럼 말하지 않습니다.
 
 ## 설치
 
@@ -63,6 +63,29 @@ git pull --ff-only
 `SKILL.md`와 `references/`를 함께 유지해야 합니다. 상세 지침은 필요한 경우에만 읽으며, 스킬 자체에는 별도의 실행 패키지가 필요하지 않습니다.
 
 Claude Code에서는 `~/.claude/skills/dual-brain` 또는 프로젝트의 `.claude/skills/dual-brain`에 설치하고 `/dual-brain`으로 호출합니다. 나머지 환경은 위 표와 [상세 안내](references/platforms.md)를 참고하세요. 붙여 넣기용 `PORTABLE.md`는 별도의 Python 실행 없이 사용할 수 있습니다.
+
+### Grok Bot·Muse에게 설치 맡기기
+
+아래 메시지를 해당 봇에게 그대로 보내세요. 봇이 원본 지침을 가져와 설치하거나 기존 설치본을 업데이트하고, 저장·적용 결과를 확인하게 됩니다.
+
+**Grok Bot 메인 봇에게:**
+
+```text
+아래 설치 지침을 읽고 이 봇에 dual-brain을 설치하거나 업데이트해줘.
+https://raw.githubusercontent.com/sleeplesshan/dual-brain/main/prompts/install-grok-bot.md
+개인 스킬로 저장하고 이 봇에서 사용할 수 있는지 확인해줘.
+```
+
+**Meta Muse에게:**
+
+```text
+아래 설치 지침을 읽고 dual-brain을 설치하거나 업데이트해줘.
+https://raw.githubusercontent.com/sleeplesshan/dual-brain/main/prompts/install-muse.md
+네가 지원하는 방식으로 재사용 지침을 저장하고 불러오기까지 확인해줘.
+이 대화에서만 적용할 수 있다면 그렇게 적용하고 알려줘.
+```
+
+나중에 업데이트할 때도 같은 메시지를 보내면 됩니다. 링크를 읽지 못하면 설치 지침의 본문을 붙여 넣고, 원본을 요청하면 `PORTABLE.md`도 전달하세요. Muse는 재사용 가능한 설치, 불러오기가 필요한 문서 저장, 현재 대화에만 적용한 상태를 구분해 보고하도록 했습니다.
 
 ## 사용법
 

@@ -17,8 +17,8 @@ Dual-Brain is useful for ambiguous designs, risky refactors, unfamiliar integrat
 | Codex | Native skill folder and `$dual-brain` / skill picker |
 | Claude Code | Native skill folder and `/dual-brain` |
 | Grok | Paste or attach [PORTABLE.md](PORTABLE.md) and request its use |
-| Grok Bot (xAI) | Supply the portable file and ask the Bot to save a named private skill |
-| Muse (Meta) | Paste the portable instructions into a Muse conversation; native skill import is not verified |
+| Grok Bot (xAI) | Send the [installer instruction](prompts/install-grok-bot.md) to the main Bot; it retrieves and saves the private skill |
+| Muse (Meta) | Send the [installer instruction](prompts/install-muse.md) to Muse; it checks and uses supported instruction storage |
 
 See [platform setup, official sources, and verification limits](references/platforms.md). These routes do not claim all five products were runtime-tested or expose the same tools. In chat-only mode, the result is analysis or a proposed patch; it cannot claim file writes, tests, independent reviewers, or saved memory that did not occur.
 
@@ -39,6 +39,29 @@ git clone https://github.com/sleeplesshan/dual-brain.git .agents/skills/dual-bra
 Existing installations under `~/.codex/skills/dual-brain` that your client already discovers can be updated in place. Avoid installing duplicate copies with the same skill name. Keep `SKILL.md` and `references/` together; the entrypoint loads supporting guidance when needed. No runtime dependency is required for the skill.
 
 For Claude Code, install at `~/.claude/skills/dual-brain` or `.claude/skills/dual-brain` and invoke `/dual-brain`. Grok, Grok Bot, and Muse setup is described in the [platform guide](references/platforms.md). No host configuration is silently modified by this repository.
+
+### Ask Grok Bot or Muse to install it
+
+Send the appropriate message directly to the receiving agent. It will fetch the skill, install or update the existing copy where supported, and report what it verified.
+
+**Grok Bot — send to your main Bot:**
+
+```text
+Read these instructions and install or update dual-brain for this Bot:
+https://raw.githubusercontent.com/sleeplesshan/dual-brain/main/prompts/install-grok-bot.md
+Verify that the private skill is saved and available to this Bot.
+```
+
+**Meta Muse — send to Muse:**
+
+```text
+Read these instructions and install or update dual-brain for me:
+https://raw.githubusercontent.com/sleeplesshan/dual-brain/main/prompts/install-muse.md
+Use supported instruction storage and verify loading. If only this conversation
+can retain it, apply it here and report that limit.
+```
+
+Reuse the same message to update later. If links cannot be opened, paste the installer text and provide `PORTABLE.md` when requested. Muse's native skill import remains unverified; the installer distinguishes reusable installation, a saved document, and session-only use.
 
 ## Use
 

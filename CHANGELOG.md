@@ -1,5 +1,10 @@
 # Changelog
 
+## Documentation update — Agent-directed installation (2026-11-07)
+
+- Adds ready-to-send installer instructions for the main xAI Grok Bot and Meta Muse, linked from English and Korean setup guides.
+- Requests retrieval of the complete portable prompt, in-place updates, and verification of supported saving/loading. Distinguishes installed skills, saved documents, and session-only use without assuming a Muse native import format.
+
 ## v1.7.0 — Portable Review Without Forced Changes (2026-11-07)
 
 - Adds an evidence-before-changes contract: clean reviews are successful, no finding quota, no speculative refactors, bounded investigation, and explicit stopping conditions.

@@ -8,7 +8,7 @@
 
 ## Warm Memory
 
-- [decision][refs:1][last_referenced:2026-11-07][last_verified:2026-11-07] Generate PORTABLE.md from core/runtime/memory sources for instruction-capable hosts. Document native setup separately from manual import and actual runtime validation. The user clarified Grokbot as xAI Grok Bot and Muse as Meta Muse; do not infer Muse installation paths from the separate Muse Code product. Evidence: user clarification on 2026-11-07, scripts/export_portable.py, and references/platforms.md.
+- [decision][refs:2][last_referenced:2026-11-07][last_verified:2026-11-07] Generate PORTABLE.md from core/runtime/memory sources. The user prefers sending installer instructions to the main xAI Grok Bot and Meta Muse so they fetch, save/update, and verify the skill themselves. Distinguish reusable installation, saved documents, session-only use, and actual runtime validation; do not infer Muse paths from Muse Code. Evidence: user instructions on 2026-11-07, prompts/install-grok-bot.md, prompts/install-muse.md, and references/platforms.md.
 - [constraint][refs:2][last_referenced:2026-10-13][last_verified:2026-10-13] Report correctness, latency, and usage separately. Structural checks and smoke tasks do not establish cross-model performance; historical token totals were withdrawn. Evidence: benchmarks/RESULTS.md and benchmarks/README.md.
 - [decision][refs:1][last_referenced:2026-10-13][last_verified:2026-10-13] Benchmark original tests remain intact; transcript wording and skill/test text cannot substitute for implementation evidence. Continuity tasks must not penalize explicit user overrides. Evidence: benchmarks/bench.py, benchmarks/evaluators/evaluate.py, and benchmark regression tests.
 
