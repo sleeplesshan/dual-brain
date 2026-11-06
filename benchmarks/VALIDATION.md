@@ -7,7 +7,7 @@
 - Skill-creator format validation passed; 24 local regression tests passed (19 existing plus 5 exporter tests).
 - The portable exporter generated the full core/runtime/memory prompt and `--check` confirmed it was current. Tests cover content preservation, internal links, stale/missing output, and source errors without partial writes.
 - Local documentation links, code fences, and `git diff --check` passed.
-- Official documentation was inspected for Codex, Claude Code, Grok, and xAI Grok Bot loading routes. See [platform guidance](../references/platforms.md) for sources and limits. No external account configuration or native host installation was tested. Muse identity remains unspecified; it receives a generic portable prompt route, not a verified adapter.
+- Official documentation was inspected for Codex, Claude Code, Grok, and xAI Grok Bot loading routes. See [platform guidance](../references/platforms.md) for sources and limits. No external account configuration or native host installation was tested. The user clarified that Muse means Meta's personal agent; its official introduction supports a conversational interface, for which we provide a portable prompt route, not a verified native adapter.
 
 ### Behavioral checks in the available agent harness
 

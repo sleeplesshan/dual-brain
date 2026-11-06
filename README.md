@@ -18,7 +18,7 @@ Dual-Brain is useful for ambiguous designs, risky refactors, unfamiliar integrat
 | Claude Code | Native skill folder and `/dual-brain` |
 | Grok | Paste or attach [PORTABLE.md](PORTABLE.md) and request its use |
 | Grok Bot (xAI) | Supply the portable file and ask the Bot to save a named private skill |
-| Muse | Paste the portable instructions; native import depends on the exact Muse product |
+| Muse (Meta) | Paste the portable instructions into a Muse conversation; native skill import is not verified |
 
 See [platform setup, official sources, and verification limits](references/platforms.md). These routes do not claim all five products were runtime-tested or expose the same tools. In chat-only mode, the result is analysis or a proposed patch; it cannot claim file writes, tests, independent reviewers, or saved memory that did not occur.
 

@@ -8,9 +8,9 @@ Documentation checked 2026-11-07. Use the same `SKILL.md` and references across 
 | Claude Code | Native skill directory | Supported subagents with an explicit brief; local passes otherwise |
 | Grok web/apps | Paste or attach `PORTABLE.md` and explicitly request its use | Review supplied material with available tools; no assumed native skill discovery |
 | Grok Bot (xAI) | Supply `PORTABLE.md` and ask the Bot to save it as a named private skill | Use the Bot's actual capabilities; confirm saving/enabling before claiming installation |
-| Muse | Paste the portable instructions into the intended product's task/instruction input, or attach them if supported | Capability-based local review; native installation and delegation must be confirmed in that product |
+| Muse (Meta) | Paste `PORTABLE.md` into a Muse conversation with the task | Use available tools or local review passes; native skill import is not verified |
 
-“Grokbot” here means xAI Grok Bot. For another bot, use the generic portable route until its host is identified. “Muse” can mean different products, including Meta's Muse personal agent and Muse Code; this guide does not assume an installation path or claim a tested native integration for either.
+“Grokbot” here means xAI Grok Bot, and “Muse” means Meta's Muse personal agent. Muse Code is a separate coding product; its features do not establish an installation path for the personal agent.
 
 ## Codex
 
@@ -61,11 +61,20 @@ capability checks, evidence-before-changes rules, and no-change stopping conditi
 
 Inspect the saved instructions and enable the private skill for the current Bot if required. Then request “Use dual-brain to [task].” Confirm the save through the Bot's response or UI; this repository cannot perform or verify that account operation for you. The Bot's documented private-skill flow does not establish a filesystem installation path. In particular, **Grok Build** is a different CLI; do not apply its directories to the Bot. [Official skills and routines](https://docs.x.ai/grok-bot/skills-routines-and-automations).
 
-## Muse and other instruction-capable hosts
+## Meta Muse
 
-Paste `PORTABLE.md` with the task into the intended Muse product. If that client provides a saved-instructions or attachment feature, use it only after checking its supported format and whether the whole text was accepted. If it cannot accept the document, provide the exact product/version before attempting a native adapter. Do not invent `.muse/skills`, a tool API, or a persistent memory location.
+Meta describes Muse as a personal agent that accepts tasks through conversation in its app or WhatsApp. Our portable route uses that conversational interface; it is not a verified native skill integration. [Official Muse introduction](https://about.fb.com/news/2026/09/introducing-muse-personal-ai-agent/).
 
-Meta describes distinct [Muse Code](https://research.meta.ai/blog/introducing-muse-code-and-muse-spark-1-2) and [Muse personal-agent](https://about.fb.com/news/2026/09/introducing-muse-personal-ai-agent/) products. Those announcements identify possible hosts; they do not validate this package's installation or execution in a user's particular client.
+Paste the complete contents of [PORTABLE.md](../PORTABLE.md) into a Muse conversation, then add:
+
+```text
+Apply these Dual-Brain instructions to this task: [task and acceptance criteria].
+Review both the overall approach and concrete details. Make changes only when
+authorized and supported by evidence. If no actionable issue remains, stop.
+Report which checks actually ran; do not claim unavailable tools or saved memory.
+```
+
+Check that the client accepted the whole document. If it offers attachments or reusable instructions, check that feature's supported format before using it. A conversation does not establish installation or persistent memory. Do not invent `.muse/skills`, a tool API, or a memory path. Use only capabilities available in the current session. Meta also documents [Muse Code](https://research.meta.ai/blog/introducing-muse-code-and-muse-spark-1-2); this guide does not transfer that product's native features to Muse.
 
 ## Portable file and updates
 
